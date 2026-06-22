@@ -32,6 +32,8 @@ class DemoPackageTests(unittest.TestCase):
                 self.assertIn("Planning Stack", dashboard_html)
                 self.assertIn("Live Inspector", dashboard_html)
                 self.assertIn("camera-inset", dashboard_html)
+                self.assertIn("icon-logo", dashboard_html)
+                self.assertIn("icon-robot", dashboard_html)
                 self.assertIn("timelineMini", dashboard_html)
                 self.assertIn("data-view=\"iso\"", dashboard_html)
                 self.assertIn("speedSelect", dashboard_html)

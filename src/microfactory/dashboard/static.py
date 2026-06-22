@@ -24,25 +24,30 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
   <title>Dual-Arm Microfactory Replay</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #090d12;
-      --band: #0f151d;
-      --panel: #141c25;
-      --panel-2: #1a2530;
-      --panel-3: #202d3a;
-      --line: #2b3b4b;
-      --text: #eef4fa;
-      --muted: #9dadbd;
-      --blue: #62b6ff;
-      --green: #57d68d;
-      --yellow: #f2c14e;
-      --red: #ff6b6b;
-      --cyan: #6ee7e7;
-      --violet: #b99cff;
-      --orange: #ff9f43;
+      --bg: #090a0c;
+      --band: #111317;
+      --panel: #15181d;
+      --panel-2: #1c2128;
+      --panel-3: #242a33;
+      --panel-4: #2b313b;
+      --line: #303844;
+      --line-strong: #4b5563;
+      --text: #f5f7fa;
+      --muted: #a7b0be;
+      --blue: #38a3ff;
+      --green: #43e07f;
+      --yellow: #ffd166;
+      --red: #ff5f7a;
+      --cyan: #2ee6d6;
+      --violet: #ad8cff;
+      --orange: #ff9f1c;
+      --steel: #cad3de;
+      --shadow: 0 18px 50px rgba(0,0,0,0.28);
     }
     * { box-sizing: border-box; }
     body {
@@ -51,6 +56,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      font-variant-numeric: tabular-nums;
     }
     main {
       width: min(1800px, calc(100vw - 20px));
@@ -59,22 +65,64 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
     header {
       display: grid;
-      grid-template-columns: minmax(300px, 1fr) auto auto;
+      grid-template-columns: minmax(330px, 1fr) auto auto;
       gap: 12px;
       align-items: center;
       margin-bottom: 8px;
       min-height: 58px;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #0d131b;
+      background: linear-gradient(180deg, #15181d, #101216);
+      box-shadow: var(--shadow);
     }
     h1, h2, h3, p { margin-top: 0; }
     h1 {
       margin-bottom: 3px;
       font-size: 21px;
+      font-weight: 900;
       letter-spacing: 0;
       line-height: 1.12;
+    }
+    .icon-sprite { display: none; }
+    .icon {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .icon.fill {
+      fill: currentColor;
+      stroke: none;
+    }
+    .brand-lockup {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 11px;
+      align-items: center;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(46,230,214,0.48);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(46,230,214,0.22), rgba(255,159,28,0.10)),
+        #101317;
+      color: var(--cyan);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 0 24px rgba(46,230,214,0.18);
+    }
+    .brand-mark .icon {
+      width: 27px;
+      height: 27px;
+      stroke-width: 1.65;
     }
     .app-caption {
       color: var(--muted);
@@ -92,15 +140,33 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       height: 32px;
       display: inline-flex;
       align-items: center;
+      gap: 7px;
       padding: 0 10px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: var(--panel-2);
-      color: #cfdbe6;
+      background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+      color: var(--steel);
       font-size: 12px;
       font-weight: 750;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
-    h2 { font-size: 18px; margin-bottom: 12px; }
+    .menu-item .icon { color: var(--cyan); width: 15px; height: 15px; }
+    .menu-item:nth-child(2) .icon { color: var(--orange); }
+    .menu-item:nth-child(3) .icon { color: var(--blue); }
+    .menu-item:nth-child(4) .icon { color: var(--green); }
+    .menu-item.active {
+      border-color: rgba(46,230,214,0.55);
+      color: #ffffff;
+      background: linear-gradient(180deg, #26333a, #172026);
+    }
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    h2 .icon { color: var(--cyan); }
     .subhead {
       color: var(--muted);
       font-size: 15px;
@@ -111,16 +177,17 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       min-width: 104px;
       height: 38px;
-      border-radius: 999px;
+      border-radius: 8px;
       border: 1px solid var(--line);
       background: var(--panel);
       font-weight: 800;
       letter-spacing: 0.02em;
     }
-    .pill.pass { color: var(--green); border-color: rgba(87, 214, 141, 0.45); }
-    .pill.fail { color: var(--red); border-color: rgba(255, 107, 107, 0.45); }
+    .pill.pass { color: var(--green); border-color: rgba(67, 224, 127, 0.5); background: rgba(67,224,127,0.08); }
+    .pill.fail { color: var(--red); border-color: rgba(255, 95, 122, 0.52); background: rgba(255,95,122,0.08); }
     .status-strip {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -129,17 +196,29 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
     .status-cell {
       min-height: 48px;
-      padding: 9px 11px;
+      padding: 10px 11px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--band);
+      background: linear-gradient(180deg, #15191f, #101318);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+    }
+    .status-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      margin-bottom: 5px;
     }
     .status-k {
-      color: var(--muted);
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 5px;
+      margin-bottom: 0;
+    }
+    .status-head .icon {
+      width: 14px;
+      height: 14px;
+      color: var(--orange);
     }
     .status-v {
       font-size: 14px;
@@ -153,11 +232,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       align-items: stretch;
     }
     .panel {
-      background: var(--panel);
+      background: linear-gradient(180deg, #161a20, #12151a);
       border: 1px solid var(--line);
       border-radius: 8px;
       overflow: hidden;
       min-width: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .panel-header {
       display: flex;
@@ -167,14 +247,22 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       min-height: 44px;
       padding: 10px 12px;
       border-bottom: 1px solid var(--line);
-      background: var(--band);
+      background: linear-gradient(180deg, #1c2128, #14181e);
     }
     .panel-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: #d9e6f2;
+      color: #eef3f8;
+    }
+    .panel-title .icon {
+      width: 15px;
+      height: 15px;
+      color: var(--cyan);
     }
     .panel-body { padding: 12px; }
     .display-list,
@@ -195,15 +283,23 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       padding: 7px 8px;
       border: 1px solid var(--line);
       border-radius: 7px;
-      background: var(--panel-2);
+      background: linear-gradient(180deg, #20262e, #1a2027);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
     }
     .display-check {
-      width: 13px;
-      height: 13px;
-      border-radius: 3px;
-      border: 1px solid rgba(238,244,250,0.5);
-      background: var(--blue);
-      box-shadow: 0 0 12px rgba(98,182,255,0.45);
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      border: 1px solid rgba(46,230,214,0.36);
+      background: rgba(46,230,214,0.10);
+      color: var(--cyan);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 0 16px rgba(46,230,214,0.10);
+    }
+    .display-check .icon {
+      width: 14px;
+      height: 14px;
     }
     .stack-row {
       grid-template-columns: 74px 1fr auto;
@@ -212,14 +308,14 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .stack-bar {
       height: 8px;
       border-radius: 999px;
-      background: #0b1118;
+      background: #0d0f12;
       overflow: hidden;
-      border: 1px solid #263747;
+      border: 1px solid #333b46;
     }
     .stack-fill {
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, var(--blue), var(--green));
+      background: linear-gradient(90deg, var(--orange), var(--cyan), var(--green));
     }
     .inspector-row {
       grid-template-columns: minmax(92px, auto) minmax(0, 1fr);
@@ -242,19 +338,26 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
     .tree-row {
       display: grid;
-      grid-template-columns: 18px 1fr auto;
+      grid-template-columns: 28px 1fr auto;
       align-items: center;
       gap: 8px;
       padding: 8px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--panel-2);
+      background: linear-gradient(180deg, #20262e, #1a2027);
     }
-    .tree-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      box-shadow: 0 0 14px currentColor;
+    .tree-icon {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.045);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 14px rgba(46,230,214,0.10);
+    }
+    .tree-icon .icon {
+      width: 15px;
+      height: 15px;
     }
     .tree-status {
       color: var(--muted);
@@ -263,13 +366,18 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .viewport-panel {
       position: relative;
       min-height: 760px;
-      background: #080c11;
+      background: #07080a;
     }
     #robotViewport {
       position: relative;
       min-height: 760px;
       height: min(76vh, 820px);
-      background: radial-gradient(circle at 50% 34%, rgba(98,182,255,0.10), transparent 30%), #080c11;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.022) 1px, transparent 1px),
+        radial-gradient(circle at 50% 34%, rgba(46,230,214,0.07), transparent 30%),
+        #07080a;
+      background-size: 32px 32px, 32px 32px, auto, auto;
     }
     #robotViewport canvas {
       display: block;
@@ -305,7 +413,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       padding: 8px 10px;
       border: 1px solid rgba(121, 147, 170, 0.32);
       border-radius: 8px;
-      background: rgba(10, 16, 23, 0.78);
+      background: rgba(13, 15, 18, 0.84);
       backdrop-filter: blur(12px);
       color: #dcecff;
       font-size: 12px;
@@ -313,7 +421,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       pointer-events: none;
     }
     .viewport-badge span {
-      color: var(--blue);
+      color: var(--cyan);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-size: 10px;
@@ -329,7 +437,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       padding: 9px 10px;
       border: 1px solid rgba(121, 147, 170, 0.32);
       border-radius: 8px;
-      background: rgba(10, 16, 23, 0.78);
+      background: rgba(13, 15, 18, 0.84);
       backdrop-filter: blur(12px);
       color: var(--muted);
       font-size: 11px;
@@ -354,7 +462,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       height: 88px;
       border: 1px solid rgba(140,165,190,0.34);
       border-radius: 8px;
-      background: rgba(12,18,26,0.72);
+      background: rgba(13, 15, 18, 0.82);
       backdrop-filter: blur(10px);
     }
     .view-cube::before {
@@ -388,7 +496,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .hud-chip,
     .legend-chip {
       border: 1px solid rgba(121, 147, 170, 0.32);
-      background: rgba(14, 22, 31, 0.86);
+      background: rgba(15, 17, 20, 0.88);
       border-radius: 8px;
       padding: 10px;
       backdrop-filter: blur(12px);
@@ -436,7 +544,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       width: 238px;
       border: 1px solid rgba(121, 147, 170, 0.32);
       border-radius: 8px;
-      background: rgba(10, 16, 23, 0.84);
+      background: rgba(13, 15, 18, 0.88);
       overflow: hidden;
       backdrop-filter: blur(12px);
       pointer-events: none;
@@ -491,32 +599,59 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
     .controls {
       display: grid;
-      grid-template-columns: auto auto auto auto minmax(180px, 1fr) auto auto;
-      gap: 10px;
+      grid-template-columns: auto auto auto auto minmax(90px, 1fr) 82px auto;
+      gap: 8px;
       align-items: center;
-      padding: 12px;
+      padding: 10px 12px;
       border-top: 1px solid var(--line);
-      background: var(--band);
+      background: linear-gradient(180deg, #181c22, #111418);
     }
     button,
     select {
       border: 1px solid var(--line);
-      background: var(--panel-2);
+      background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
       color: var(--text);
       border-radius: 8px;
-      padding: 9px 12px;
+      padding: 8px 10px;
       font-weight: 750;
       cursor: pointer;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
-    button:hover { border-color: var(--blue); }
-    button.active { border-color: var(--blue); color: var(--blue); background: #17293a; }
-    input[type="range"] { width: 100%; accent-color: var(--blue); }
+    button:hover { border-color: var(--cyan); color: #ffffff; }
+    button.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: linear-gradient(180deg, #203039, #162025);
+    }
+    button .icon { width: 15px; height: 15px; }
+    .view-btn {
+      min-width: 48px;
+      padding-inline: 10px;
+    }
+    .command-btn {
+      min-width: 78px;
+    }
+    #prevCriticalBtn,
+    #nextCriticalBtn {
+      min-width: 92px;
+      line-height: 1.05;
+    }
+    #recordingModeBtn {
+      min-width: 86px;
+    }
+    select { width: 82px; }
+    input[type="range"] { width: 100%; accent-color: var(--orange); }
     .timeline-mini {
       position: relative;
       height: 54px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #0b1118;
+      background: #0c0e11;
       margin-bottom: 10px;
       overflow: hidden;
     }
@@ -553,21 +688,41 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       gap: 10px;
     }
     .metric {
-      background: var(--panel-2);
+      background: linear-gradient(180deg, #20262e, #181d24);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px;
       min-height: 78px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--cyan);
     }
     .metric-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       color: var(--muted);
       font-size: 12px;
       margin-bottom: 8px;
+    }
+    .metric-label .icon {
+      width: 14px;
+      height: 14px;
+      color: var(--cyan);
     }
     .metric-value {
       font-size: 22px;
       font-weight: 850;
       line-height: 1;
+      color: #ffffff;
     }
     .filter-bar {
       display: grid;
@@ -580,9 +735,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       color: var(--muted);
     }
     .filter-bar button.active {
-      border-color: var(--blue);
-      color: var(--blue);
-      background: #17293a;
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: #172526;
     }
     .event-list {
       display: grid;
@@ -594,11 +749,11 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .event {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: var(--panel-2);
+      background: linear-gradient(180deg, #20262e, #171c23);
       padding: 10px;
       cursor: pointer;
     }
-    .event.active { border-color: var(--blue); background: #1b2d3d; }
+    .event.active { border-color: var(--orange); background: #2b251b; }
     .event-top {
       display: flex;
       justify-content: space-between;
@@ -606,6 +761,17 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       margin-bottom: 4px;
       color: var(--muted);
       font-size: 12px;
+    }
+    .event-phase {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .event-phase .icon {
+      width: 14px;
+      height: 14px;
+      color: var(--orange);
     }
     .event-msg {
       font-size: 13px;
@@ -661,12 +827,16 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       font-size: 12px;
     }
     .statusbar span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--band);
       padding: 8px 10px;
       overflow-wrap: anywhere;
     }
+    .statusbar .icon { color: var(--orange); }
     .recording-mode main {
       width: min(1440px, calc(100vw - 24px));
       padding-top: 10px;
@@ -712,40 +882,151 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
   </style>
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-logo" viewBox="0 0 24 24">
+      <path d="M5 7.5 12 3l7 4.5v9L12 21l-7-4.5z"></path>
+      <path d="M12 3v8.8m7-4.3-7 4.3-7-4.3"></path>
+      <path d="M8.2 14.2h7.6M9.5 16.5h5"></path>
+    </symbol>
+    <symbol id="icon-cube" viewBox="0 0 24 24">
+      <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"></path>
+      <path d="M12 12 4 7.5m8 4.5 8-4.5M12 12v9"></path>
+    </symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24">
+      <path d="M5 18c5 0 4-12 9-12h5"></path>
+      <circle cx="5" cy="18" r="2"></circle>
+      <circle cx="19" cy="6" r="2"></circle>
+    </symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24">
+      <path d="M4 8h4l1.4-2h5.2L16 8h4v10H4z"></path>
+      <circle cx="12" cy="13" r="3.2"></circle>
+    </symbol>
+    <symbol id="icon-clipboard" viewBox="0 0 24 24">
+      <path d="M9 5h6l1 2h3v14H5V7h3z"></path>
+      <path d="M9 12h6M9 16h4"></path>
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8"></circle>
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path>
+    </symbol>
+    <symbol id="icon-gauge" viewBox="0 0 24 24">
+      <path d="M4 15a8 8 0 0 1 16 0"></path>
+      <path d="m12 15 4-5"></path>
+      <path d="M7 19h10"></path>
+    </symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24">
+      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"></path>
+      <circle cx="12" cy="12" r="2.5"></circle>
+    </symbol>
+    <symbol id="icon-robot" viewBox="0 0 24 24">
+      <path d="M7 10h10v8H7z"></path>
+      <path d="M9 10V7h6v3M12 7V4"></path>
+      <circle cx="10" cy="14" r="1"></circle>
+      <circle cx="14" cy="14" r="1"></circle>
+      <path d="M5 13H3m18 0h-2M9 18v2m6-2v2"></path>
+    </symbol>
+    <symbol id="icon-displays" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="11" rx="2"></rect>
+      <path d="M8 20h8M12 16v4"></path>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24">
+      <path d="m12 4 9 5-9 5-9-5z"></path>
+      <path d="m3 13 9 5 9-5"></path>
+    </symbol>
+    <symbol id="icon-stack" viewBox="0 0 24 24">
+      <path d="M5 7h14M5 12h14M5 17h14"></path>
+      <path d="M8 7v10"></path>
+    </symbol>
+    <symbol id="icon-metrics" viewBox="0 0 24 24">
+      <path d="M5 19V9m7 10V5m7 14v-7"></path>
+    </symbol>
+    <symbol id="icon-fit" viewBox="0 0 24 24">
+      <path d="M8 4H4v4m12-4h4v4M8 20H4v-4m16 0v4h-4"></path>
+      <path d="M9 9h6v6H9z"></path>
+    </symbol>
+    <symbol id="icon-ghost" viewBox="0 0 24 24">
+      <path d="M6 20V9a6 6 0 0 1 12 0v11l-3-2-3 2-3-2z"></path>
+      <circle cx="10" cy="11" r="1"></circle>
+      <circle cx="14" cy="11" r="1"></circle>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z"></path>
+    </symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24">
+      <path d="M8 5v14M16 5v14"></path>
+    </symbol>
+    <symbol id="icon-reset" viewBox="0 0 24 24">
+      <path d="M5 12a7 7 0 1 0 2-5"></path>
+      <path d="M5 5v5h5"></path>
+    </symbol>
+    <symbol id="icon-prev" viewBox="0 0 24 24">
+      <path d="M11 7 6 12l5 5M18 7l-5 5 5 5"></path>
+    </symbol>
+    <symbol id="icon-next" viewBox="0 0 24 24">
+      <path d="m6 7 5 5-5 5M13 7l5 5-5 5"></path>
+    </symbol>
+    <symbol id="icon-record" viewBox="0 0 24 24">
+      <rect x="5" y="5" width="14" height="14" rx="3"></rect>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6"></path>
+    </symbol>
+    <symbol id="icon-timeline" viewBox="0 0 24 24">
+      <path d="M4 12h16"></path>
+      <circle cx="7" cy="12" r="2"></circle>
+      <circle cx="14" cy="12" r="2"></circle>
+      <path d="M19 8v8"></path>
+    </symbol>
+    <symbol id="icon-inspector" viewBox="0 0 24 24">
+      <path d="M5 4h10l4 4v12H5z"></path>
+      <path d="M15 4v4h4M8 12h8M8 16h5"></path>
+    </symbol>
+    <symbol id="icon-filter" viewBox="0 0 24 24">
+      <path d="M4 6h16M7 12h10M10 18h4"></path>
+    </symbol>
+    <symbol id="icon-axis" viewBox="0 0 24 24">
+      <path d="M12 19V5m0 0-3 3m3-3 3 3M5 16l7-4 7 4"></path>
+    </symbol>
+  </svg>
   <main>
     <header>
-      <div>
-        <h1>Dual-Arm Autonomous Microfactory</h1>
-        <div class="app-caption">RoboDK/RViz-style Three.js workcell replay</div>
+      <div class="brand-lockup">
+        <div class="brand-mark"><svg class="icon"><use href="#icon-logo"></use></svg></div>
+        <div>
+          <h1>Dual-Arm Autonomous Microfactory</h1>
+          <div class="app-caption">RoboDK/RViz-style Three.js workcell replay</div>
+        </div>
       </div>
       <nav class="menu-strip" aria-label="Application toolbar">
-        <span class="menu-item">Planning Scene</span>
-        <span class="menu-item">Motion Replay</span>
-        <span class="menu-item">Perception</span>
-        <span class="menu-item">Evidence</span>
+        <span class="menu-item active"><svg class="icon"><use href="#icon-cube"></use></svg>Planning Scene</span>
+        <span class="menu-item"><svg class="icon"><use href="#icon-route"></use></svg>Motion Replay</span>
+        <span class="menu-item"><svg class="icon"><use href="#icon-camera"></use></svg>Perception</span>
+        <span class="menu-item"><svg class="icon"><use href="#icon-clipboard"></use></svg>Evidence</span>
       </nav>
-      <div id="final-pill" class="pill">RUN</div>
+      <div id="final-pill" class="pill"><svg class="icon"><use href="#icon-gauge"></use></svg>RUN</div>
     </header>
 
     <section class="status-strip" aria-label="Run status">
       <div class="status-cell">
-        <div class="status-k">Scenario</div>
+        <div class="status-head"><svg class="icon"><use href="#icon-cube"></use></svg><div class="status-k">Scenario</div></div>
         <div class="status-v" id="scenarioName">conveyor recovery</div>
       </div>
       <div class="status-cell">
-        <div class="status-k">Planner</div>
+        <div class="status-head"><svg class="icon"><use href="#icon-route"></use></svg><div class="status-k">Planner</div></div>
         <div class="status-v" id="plannerHealth">deterministic</div>
       </div>
       <div class="status-cell">
-        <div class="status-k">Clearance</div>
+        <div class="status-head"><svg class="icon"><use href="#icon-target"></use></svg><div class="status-k">Clearance</div></div>
         <div class="status-v" id="clearanceReadout">-- mm</div>
       </div>
       <div class="status-cell">
-        <div class="status-k">Vision Confidence</div>
+        <div class="status-head"><svg class="icon"><use href="#icon-eye"></use></svg><div class="status-k">Vision Confidence</div></div>
         <div class="status-v" id="confidenceReadout">--</div>
       </div>
       <div class="status-cell">
-        <div class="status-k">Robot Mode</div>
+        <div class="status-head"><svg class="icon"><use href="#icon-robot"></use></svg><div class="status-k">Robot Mode</div></div>
         <div class="status-v" id="robotMode">ready</div>
       </div>
     </section>
@@ -753,31 +1034,31 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     <section class="sim-shell">
       <aside class="panel left-panel">
         <div class="panel-header">
-          <div class="panel-title">Displays</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-displays"></use></svg>Displays</div>
         </div>
         <div class="panel-body">
           <div class="display-list">
-            <div class="display-row"><span class="display-check"></span><span>Planning scene</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"></span><span>Robot links</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"></span><span>Safety envelopes</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"></span><span>Camera frustum</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"></span><span>Toolpath waypoints</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-cube"></use></svg></span><span>Planning scene</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-robot"></use></svg></span><span>Robot links</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-target"></use></svg></span><span>Safety envelopes</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-camera"></use></svg></span><span>Camera frustum</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-route"></use></svg></span><span>Toolpath waypoints</span><span>on</span></div>
           </div>
         </div>
         <div class="panel-header">
-          <div class="panel-title">Scene Tree</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-layers"></use></svg>Scene Tree</div>
         </div>
         <div class="panel-body">
           <div class="scene-tree" id="sceneTree"></div>
         </div>
         <div class="panel-header">
-          <div class="panel-title">Planning Stack</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-stack"></use></svg>Planning Stack</div>
         </div>
         <div class="panel-body">
           <div class="stack-list" id="planningStack"></div>
         </div>
         <div class="panel-header">
-          <div class="panel-title">Run Metrics</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-metrics"></use></svg>Run Metrics</div>
         </div>
         <div class="panel-body">
           <div class="metric-grid" id="metrics"></div>
@@ -788,14 +1069,14 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         <div id="robotViewport" aria-label="Three.js robotics workcell viewport">
           <div class="viewport-toolbar">
             <div class="toolbar-group">
-              <button class="active" data-view="iso">Iso</button>
-              <button data-view="top">Top</button>
-              <button data-view="side">Side</button>
-              <button data-view="front">Front</button>
+              <button class="view-btn active" data-view="iso"><svg class="icon"><use href="#icon-cube"></use></svg>Iso</button>
+              <button class="view-btn" data-view="top"><svg class="icon"><use href="#icon-axis"></use></svg>Top</button>
+              <button class="view-btn" data-view="side"><svg class="icon"><use href="#icon-axis"></use></svg>Side</button>
+              <button class="view-btn" data-view="front"><svg class="icon"><use href="#icon-axis"></use></svg>Front</button>
             </div>
             <div class="toolbar-group">
-              <button id="fitViewBtn">Fit View</button>
-              <button id="ghostBtn" class="active">Ghosts</button>
+              <button id="fitViewBtn"><svg class="icon"><use href="#icon-fit"></use></svg>Fit View</button>
+              <button id="ghostBtn" class="active"><svg class="icon"><use href="#icon-ghost"></use></svg>Ghosts</button>
             </div>
           </div>
           <div class="viewport-badge"><span>World</span> MoveIt-style planning scene</div>
@@ -836,10 +1117,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
           </div>
         </div>
         <div class="controls">
-          <button id="playBtn">Play</button>
-          <button id="resetBtn">Reset</button>
-          <button id="prevCriticalBtn">Prev Critical</button>
-          <button id="nextCriticalBtn">Next Critical</button>
+          <button id="playBtn" class="command-btn"><svg class="icon"><use href="#icon-play"></use></svg>Play</button>
+          <button id="resetBtn" class="command-btn"><svg class="icon"><use href="#icon-reset"></use></svg>Reset</button>
+          <button id="prevCriticalBtn" class="command-btn"><svg class="icon"><use href="#icon-prev"></use></svg>Prev Critical</button>
+          <button id="nextCriticalBtn" class="command-btn"><svg class="icon"><use href="#icon-next"></use></svg>Next Critical</button>
           <input id="scrubber" type="range" min="0" max="0" value="0" step="1" aria-label="Replay scrubber">
           <select id="speedSelect" aria-label="Playback speed">
             <option value="700">0.6x</option>
@@ -847,28 +1128,28 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
             <option value="240">1.75x</option>
             <option value="120">3.5x</option>
           </select>
-          <button id="recordingModeBtn">Recording</button>
+          <button id="recordingModeBtn" class="command-btn"><svg class="icon"><use href="#icon-record"></use></svg>Recording</button>
           <span id="stepLabel" class="muted">0 / 0</span>
         </div>
       </section>
 
       <aside class="panel right-panel">
         <div class="panel-header">
-          <div class="panel-title">Live Inspector</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-inspector"></use></svg>Live Inspector</div>
         </div>
         <div class="panel-body">
           <div class="inspector-list" id="eventInspector"></div>
         </div>
         <div class="panel-header">
-          <div class="panel-title">Replay Timeline</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-timeline"></use></svg>Replay Timeline</div>
         </div>
         <div class="panel-body">
           <div class="timeline-mini" id="timelineMini"></div>
           <div class="filter-bar" id="filterBar">
-            <button class="active" data-filter="all">All</button>
-            <button data-filter="critical">Critical</button>
-            <button data-filter="recovery">Recovery</button>
-            <button data-filter="planning">Planning</button>
+            <button class="active" data-filter="all"><svg class="icon"><use href="#icon-filter"></use></svg>All</button>
+            <button data-filter="critical"><svg class="icon"><use href="#icon-target"></use></svg>Critical</button>
+            <button data-filter="recovery"><svg class="icon"><use href="#icon-reset"></use></svg>Recovery</button>
+            <button data-filter="planning"><svg class="icon"><use href="#icon-route"></use></svg>Planning</button>
           </div>
           <div class="event-list" id="eventList"></div>
         </div>
@@ -878,20 +1159,20 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     <section class="details">
       <div class="panel">
         <div class="panel-body">
-          <h2>What This Proves</h2>
+          <h2><svg class="icon"><use href="#icon-check"></use></svg>What This Proves</h2>
           <div class="callout">
             The replay is rendered from generated event data: planned paths, pose estimates,
             bimanual stabilization, robot-link motion, failure detection, recovery, and final
             functional acceptance.
           </div>
           <div style="margin-top: 12px;">
-            <button id="copySummaryBtn">Copy Run Summary</button>
+            <button id="copySummaryBtn"><svg class="icon"><use href="#icon-clipboard"></use></svg>Copy Run Summary</button>
           </div>
         </div>
       </div>
       <div class="panel">
         <div class="panel-body">
-          <h2>Critical Events</h2>
+          <h2><svg class="icon"><use href="#icon-target"></use></svg>Critical Events</h2>
           <table class="log-table">
             <thead><tr><th>#</th><th>Phase</th><th>Status</th><th>Message</th></tr></thead>
             <tbody id="criticalRows"></tbody>
@@ -900,16 +1181,16 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       </div>
       <div class="panel">
         <div class="panel-body">
-          <h2>Raw Run Payload</h2>
+          <h2><svg class="icon"><use href="#icon-inspector"></use></svg>Raw Run Payload</h2>
           <pre>__RAW_PAYLOAD__</pre>
         </div>
       </div>
     </section>
     <footer class="statusbar">
-      <span>Renderer: Three.js WebGL, local vendor bundle</span>
-      <span>Scene: generated from deterministic event log</span>
-      <span>Control: scrub, replay, jump critical, orbit, zoom</span>
-      <span>Artifacts: metrics, event JSON, acceptance report</span>
+      <span><svg class="icon"><use href="#icon-cube"></use></svg>Renderer: Three.js WebGL, local vendor bundle</span>
+      <span><svg class="icon"><use href="#icon-layers"></use></svg>Scene: generated from deterministic event log</span>
+      <span><svg class="icon"><use href="#icon-route"></use></svg>Control: scrub, replay, jump critical, orbit, zoom</span>
+      <span><svg class="icon"><use href="#icon-clipboard"></use></svg>Artifacts: metrics, event JSON, acceptance report</span>
     </footer>
   </main>
 
@@ -933,6 +1214,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
+    const svgIcon = (name) => `<svg class="icon" aria-hidden="true"><use href="#icon-${name}"></use></svg>`;
     const criticalPhases = new Set(["active_vision", "bimanual_coordination", "functional_test"]);
     const colors = {
       blue: 0x62b6ff,
@@ -1550,6 +1832,20 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       el(id).textContent = value;
     }
 
+    function setButtonContent(id, icon, label) {
+      el(id).innerHTML = `${svgIcon(icon)}${label}`;
+    }
+
+    function phaseIcon(phase, status = "pass") {
+      if (status === "fail") return "target";
+      if (status === "recovered") return "reset";
+      if (phase.includes("vision") || phase === "perception") return "camera";
+      if (phase.includes("planning")) return "route";
+      if (phase === "bimanual_coordination" || phase === "execution") return "robot";
+      if (phase === "functional_test" || phase === "verification") return "check";
+      return "timeline";
+    }
+
     function isCritical(event) {
       return event.status !== "pass" || criticalPhases.has(event.phase);
     }
@@ -1569,16 +1865,16 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       if (playing) {
         playing = false;
         clearInterval(timer);
-        el("playBtn").textContent = "Play";
+        setButtonContent("playBtn", "play", "Play");
         return;
       }
       playing = true;
-      el("playBtn").textContent = "Pause";
+      setButtonContent("playBtn", "pause", "Pause");
       timer = setInterval(() => {
         if (index >= events.length - 1) {
           playing = false;
           clearInterval(timer);
-          el("playBtn").textContent = "Replay";
+          setButtonContent("playBtn", "reset", "Replay");
           return;
         }
         renderAt(index + 1);
@@ -1666,41 +1962,41 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     function renderMetrics() {
       const metrics = payload.metrics;
       const items = [
-        ["Final status", metrics.final_status],
-        ["Recovery events", metrics.recovered_events],
-        ["Active vision events", metrics.active_vision_events],
-        ["Bimanual assists", metrics.bimanual_events],
-        ["Motion plans", metrics.motion_plan_count],
-        ["Min clearance", `${metrics.minimum_clearance_mm} mm`],
-        ["Avg plan time", `${metrics.average_planning_time_ms} ms`],
-        ["Sim elapsed", `${metrics.simulated_elapsed_s}s`],
+        ["check", "Final status", metrics.final_status],
+        ["reset", "Recovery events", metrics.recovered_events],
+        ["camera", "Active vision events", metrics.active_vision_events],
+        ["robot", "Bimanual assists", metrics.bimanual_events],
+        ["route", "Motion plans", metrics.motion_plan_count],
+        ["target", "Min clearance", `${metrics.minimum_clearance_mm} mm`],
+        ["gauge", "Avg plan time", `${metrics.average_planning_time_ms} ms`],
+        ["timeline", "Sim elapsed", `${metrics.simulated_elapsed_s}s`],
       ];
-      el("metrics").innerHTML = items.map(([label, value]) => `
+      el("metrics").innerHTML = items.map(([icon, label, value]) => `
         <div class="metric">
-          <div class="metric-label">${label}</div>
+          <div class="metric-label">${svgIcon(icon)}${label}</div>
           <div class="metric-value">${value}</div>
         </div>
       `).join("");
       const pill = el("final-pill");
-      pill.textContent = metrics.final_status;
+      pill.innerHTML = `${svgIcon(metrics.final_status === "PASS" ? "check" : "target")}${metrics.final_status}`;
       pill.classList.add(metrics.final_status === "PASS" ? "pass" : "fail");
     }
 
     function renderSceneTree(state) {
       const rows = [
-        ["left arm", "#62b6ff", "active"],
-        ["right arm", "#b99cff", "active"],
-        ["RGB-D camera", "#62b6ff", state.cameraPulse ? "observing" : "ready"],
-        ["fixture", state.fixtureMode === "fault" ? "#ff6b6b" : state.fixtureMode === "accepted" ? "#57d68d" : "#9fb3c6", state.fixtureMode],
-        ["base", "#6ee7e7", state.installed.has("base") ? "installed" : "pending"],
-        ["rollers", "#f2c14e", `${Number(state.installed.has("rollerA")) + Number(state.installed.has("rollerB"))}/2`],
-        ["belt", state.beltFault ? "#ff6b6b" : "#57d68d", state.installed.has("belt") ? "seated" : "pending"],
-        ["motor", "#b99cff", state.installed.has("motor") ? "installed" : "pending"],
-        ["sensor", "#62b6ff", state.installed.has("sensor") ? "installed" : "pending"],
+        ["robot", "left arm", "#38a3ff", "active"],
+        ["robot", "right arm", "#ad8cff", "active"],
+        ["camera", "RGB-D camera", "#38a3ff", state.cameraPulse ? "observing" : "ready"],
+        ["cube", "fixture", state.fixtureMode === "fault" ? "#ff5f7a" : state.fixtureMode === "accepted" ? "#43e07f" : "#cad3de", state.fixtureMode],
+        ["cube", "base", "#2ee6d6", state.installed.has("base") ? "installed" : "pending"],
+        ["axis", "rollers", "#ffd166", `${Number(state.installed.has("rollerA")) + Number(state.installed.has("rollerB"))}/2`],
+        ["route", "belt", state.beltFault ? "#ff5f7a" : "#43e07f", state.installed.has("belt") ? "seated" : "pending"],
+        ["gauge", "motor", "#ad8cff", state.installed.has("motor") ? "installed" : "pending"],
+        ["target", "sensor", "#38a3ff", state.installed.has("sensor") ? "installed" : "pending"],
       ];
-      el("sceneTree").innerHTML = rows.map(([label, color, status]) => `
+      el("sceneTree").innerHTML = rows.map(([icon, label, color, status]) => `
         <div class="tree-row">
-          <span class="tree-dot" style="color:${color}; background:${color};"></span>
+          <span class="tree-icon" style="color:${color};">${svgIcon(icon)}</span>
           <span>${label}</span>
           <span class="tree-status">${status}</span>
         </div>
@@ -1806,7 +2102,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       el("eventList").innerHTML = rows.map(([event, i]) => `
         <div class="event" data-event-index="${i}">
           <div class="event-top">
-            <span>#${event.sequence} ${event.phase}</span>
+            <span class="event-phase">${svgIcon(phaseIcon(event.phase, event.status))}#${event.sequence} ${event.phase}</span>
             <span class="${statusClass(event.status)}">${event.status}</span>
           </div>
           <div class="event-msg">${event.message}</div>
@@ -1846,7 +2142,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       const text = runSummaryText();
       try {
         await navigator.clipboard.writeText(text);
-        el("copySummaryBtn").textContent = "Copied";
+        setButtonContent("copySummaryBtn", "check", "Copied");
       } catch {
         const area = document.createElement("textarea");
         area.value = text;
@@ -1854,10 +2150,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         area.select();
         document.execCommand("copy");
         area.remove();
-        el("copySummaryBtn").textContent = "Copied";
+        setButtonContent("copySummaryBtn", "check", "Copied");
       }
       setTimeout(() => {
-        el("copySummaryBtn").textContent = "Copy Run Summary";
+        setButtonContent("copySummaryBtn", "clipboard", "Copy Run Summary");
       }, 1400);
     }
 
@@ -1865,7 +2161,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     el("resetBtn").addEventListener("click", () => {
       playing = false;
       clearInterval(timer);
-      el("playBtn").textContent = "Play";
+      setButtonContent("playBtn", "play", "Play");
       renderAt(0);
     });
     el("prevCriticalBtn").addEventListener("click", () => jumpCritical(-1));
@@ -1876,9 +2172,11 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     });
     el("recordingModeBtn").addEventListener("click", () => {
       document.body.classList.toggle("recording-mode");
-      el("recordingModeBtn").textContent = document.body.classList.contains("recording-mode")
-        ? "Exit Recording"
-        : "Recording";
+      if (document.body.classList.contains("recording-mode")) {
+        setButtonContent("recordingModeBtn", "record", "Exit Recording");
+      } else {
+        setButtonContent("recordingModeBtn", "record", "Recording");
+      }
       requestAnimationFrame(resizeRenderer);
     });
     el("copySummaryBtn").addEventListener("click", copyRunSummary);
