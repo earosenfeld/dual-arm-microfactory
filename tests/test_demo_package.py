@@ -15,11 +15,16 @@ class DemoPackageTests(unittest.TestCase):
 
             self.assertEqual(len(runs), len(DEMO_SCENARIOS))
             self.assertTrue((output_dir / "index.html").exists())
+            self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "linkedin-post.md").exists())
             self.assertTrue((output_dir / "README.md").exists())
+            index = (output_dir / "index.html").read_text(encoding="utf-8")
+            self.assertIn("Scenario Workbench", index)
+            self.assertIn("recordingModeButton", index)
             for scenario in DEMO_SCENARIOS:
                 self.assertTrue((output_dir / scenario / "dashboard.html").exists())
                 self.assertTrue((output_dir / scenario / "acceptance_report.md").exists())
+                self.assertTrue((output_dir / scenario / "metrics.json").exists())
 
 
 if __name__ == "__main__":

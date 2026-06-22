@@ -49,6 +49,9 @@ Generate the LinkedIn-ready demo package:
 PYTHONPATH=src python3 -m microfactory demo
 ```
 
+The generated `index.html` is an interactive scenario workbench with embedded replay
+dashboards, comparison metrics, reports, and a recording mode.
+
 Run tests:
 
 ```bash
@@ -69,6 +72,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 
 See [docs/linkedin-recording-guide.md](docs/linkedin-recording-guide.md) for the
 recommended screen-recording flow and caption framing.
+See [docs/app-workbench.md](docs/app-workbench.md) for the generated application surface.
 
 ## Non-Goals
 
