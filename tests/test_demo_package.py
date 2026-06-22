@@ -27,11 +27,37 @@ class DemoPackageTests(unittest.TestCase):
                 dashboard_html = dashboard.read_text(encoding="utf-8")
                 self.assertIn("robotViewport", dashboard_html)
                 self.assertIn("RoboDK/RViz-style", dashboard_html)
+                self.assertIn("three.module.min.js", dashboard_html)
+                self.assertIn("MoveIt-style planning scene", dashboard_html)
+                self.assertIn("Planning Stack", dashboard_html)
+                self.assertIn("Live Inspector", dashboard_html)
+                self.assertIn("camera-inset", dashboard_html)
+                self.assertIn("timelineMini", dashboard_html)
                 self.assertIn("data-view=\"iso\"", dashboard_html)
                 self.assertIn("speedSelect", dashboard_html)
                 self.assertIn("nextCriticalBtn", dashboard_html)
                 self.assertIn("filterBar", dashboard_html)
                 self.assertIn("copySummaryBtn", dashboard_html)
+                self.assertTrue(
+                    (
+                        output_dir
+                        / scenario
+                        / "assets"
+                        / "vendor"
+                        / "three"
+                        / "three.module.min.js"
+                    ).exists()
+                )
+                self.assertTrue(
+                    (
+                        output_dir
+                        / scenario
+                        / "assets"
+                        / "vendor"
+                        / "three"
+                        / "three.core.min.js"
+                    ).exists()
+                )
                 self.assertTrue((output_dir / scenario / "acceptance_report.md").exists())
                 self.assertTrue((output_dir / scenario / "metrics.json").exists())
 

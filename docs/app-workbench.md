@@ -8,7 +8,8 @@ Generate it:
 PYTHONPATH=src python3 -m microfactory demo
 ```
 
-Open the generated `runs/<timestamp>-linkedin-demo/index.html`.
+Open the generated `runs/<timestamp>-linkedin-demo/index.html` through a local HTTP
+server so the browser can load the vendored Three.js module.
 
 ## What It Shows
 
@@ -22,7 +23,7 @@ Open the generated `runs/<timestamp>-linkedin-demo/index.html`.
 
 Each scenario dashboard also includes playback speed, jump-to-critical controls, event
 filters, live state chips, a copyable run summary, and its own recording mode. The
-main replay is a canvas-based robotics viewport with floor grid, coordinate axes,
+main replay is a Three.js/WebGL robotics viewport with floor grid, coordinate axes,
 camera frustum, trays, fixture, robot links, tool poses, planned paths, and installed
 parts rendered from the event log.
 

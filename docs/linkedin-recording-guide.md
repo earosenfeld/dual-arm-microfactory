@@ -6,7 +6,8 @@
 PYTHONPATH=src python3 -m microfactory demo
 ```
 
-Open the generated `index.html`, then open the `belt_slip` dashboard first.
+Open the generated `index.html` through a local HTTP server, then open the `belt_slip`
+dashboard first.
 
 ## 60-Second Recording
 
@@ -16,7 +17,8 @@ Open the generated `index.html`, then open the `belt_slip` dashboard first.
 4. Pause when the belt slip failure appears.
 5. Use `Next Critical` to jump through the failure, recovery, and final functional test.
 6. Show the metrics cards and live state chips.
-7. Switch the viewport from `Iso` to `Top` briefly to show the robotics-workbench feel.
+7. Orbit the Three.js viewport, then switch from `Iso` to `Top` briefly to show the
+   robotics-workbench feel.
 8. Toggle the `Critical` filter in the timeline.
 9. End on the final `PASS` status.
 

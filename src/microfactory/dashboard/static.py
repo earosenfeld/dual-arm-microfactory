@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+import shutil
 from pathlib import Path
 
 from microfactory.control.assembly import AssemblyResult
@@ -15,6 +16,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         "state": result.state.as_dict(),
         "events": result.log.as_list(),
     }
+    _copy_three_vendor(output_path.parent)
     serialized = json.dumps(payload, indent=2)
     escaped = html.escape(serialized)
     template = """<!doctype html>
@@ -26,11 +28,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0c1016;
-      --band: #101821;
-      --panel: #151d27;
-      --panel-2: #1b2632;
-      --line: #2a3948;
+      --bg: #090d12;
+      --band: #0f151d;
+      --panel: #141c25;
+      --panel-2: #1a2530;
+      --panel-3: #202d3a;
+      --line: #2b3b4b;
       --text: #eef4fa;
       --muted: #9dadbd;
       --blue: #62b6ff;
@@ -39,6 +42,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       --red: #ff6b6b;
       --cyan: #6ee7e7;
       --violet: #b99cff;
+      --orange: #ff9f43;
     }
     * { box-sizing: border-box; }
     body {
@@ -46,31 +50,61 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
+      min-height: 100vh;
     }
     main {
-      width: min(1480px, calc(100vw - 40px));
+      width: min(1800px, calc(100vw - 20px));
       margin: 0 auto;
-      padding: 28px 0 40px;
+      padding: 10px 0 28px;
     }
     header {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 20px;
-      align-items: end;
-      margin-bottom: 18px;
+      grid-template-columns: minmax(300px, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+      min-height: 58px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d131b;
     }
     h1, h2, h3, p { margin-top: 0; }
     h1 {
-      margin-bottom: 8px;
-      font-size: clamp(30px, 4vw, 56px);
+      margin-bottom: 3px;
+      font-size: 21px;
       letter-spacing: 0;
-      line-height: 1;
+      line-height: 1.12;
+    }
+    .app-caption {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+    .menu-strip {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .menu-item {
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: #cfdbe6;
+      font-size: 12px;
+      font-weight: 750;
     }
     h2 { font-size: 18px; margin-bottom: 12px; }
     .subhead {
       color: var(--muted);
-      font-size: 16px;
-      max-width: 900px;
+      font-size: 15px;
+      max-width: 940px;
       line-height: 1.45;
     }
     .pill {
@@ -82,88 +116,385 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border-radius: 999px;
       border: 1px solid var(--line);
       background: var(--panel);
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.02em;
     }
     .pill.pass { color: var(--green); border-color: rgba(87, 214, 141, 0.45); }
     .pill.fail { color: var(--red); border-color: rgba(255, 107, 107, 0.45); }
-    .layout {
+    .status-strip {
       display: grid;
-      grid-template-columns: minmax(720px, 1.5fr) minmax(360px, 0.75fr);
-      gap: 16px;
-      align-items: start;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .status-cell {
+      min-height: 48px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--band);
+    }
+    .status-k {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+    .status-v {
+      font-size: 14px;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+    .sim-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(640px, 1fr) 340px;
+      gap: 8px;
+      align-items: stretch;
     }
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
       overflow: hidden;
+      min-width: 0;
     }
-    .panel-body { padding: 16px; }
-    .viewport-shell {
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--band);
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #d9e6f2;
+    }
+    .panel-body { padding: 12px; }
+    .display-list,
+    .stack-list,
+    .inspector-list {
+      display: grid;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .display-row,
+    .stack-row,
+    .inspector-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 7px 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+    }
+    .display-check {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      border: 1px solid rgba(238,244,250,0.5);
+      background: var(--blue);
+      box-shadow: 0 0 12px rgba(98,182,255,0.45);
+    }
+    .stack-row {
+      grid-template-columns: 74px 1fr auto;
+      font-variant-numeric: tabular-nums;
+    }
+    .stack-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #0b1118;
+      overflow: hidden;
+      border: 1px solid #263747;
+    }
+    .stack-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+    }
+    .inspector-row {
+      grid-template-columns: minmax(92px, auto) minmax(0, 1fr);
+    }
+    .inspector-key {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 10px;
+    }
+    .inspector-value {
+      color: #e9f2fb;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+    .scene-tree {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .tree-row {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+    .tree-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 14px currentColor;
+    }
+    .tree-status {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .viewport-panel {
       position: relative;
-      min-height: 620px;
-      background:
-        radial-gradient(circle at 42% 22%, rgba(98, 182, 255, 0.10), transparent 34%),
-        linear-gradient(180deg, #101923 0%, #0d131a 100%);
+      min-height: 760px;
+      background: #080c11;
     }
-    canvas {
+    #robotViewport {
+      position: relative;
+      min-height: 760px;
+      height: min(76vh, 820px);
+      background: radial-gradient(circle at 50% 34%, rgba(98,182,255,0.10), transparent 30%), #080c11;
+    }
+    #robotViewport canvas {
       display: block;
       width: 100%;
-      height: 620px;
+      height: 100%;
+      outline: none;
     }
     .viewport-toolbar {
       position: absolute;
       top: 12px;
       left: 12px;
       right: 12px;
+      z-index: 5;
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       pointer-events: none;
     }
-    .viewport-toolbar > div {
+    .toolbar-group {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       pointer-events: auto;
     }
+    .viewport-badge {
+      position: absolute;
+      top: 62px;
+      left: 12px;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid rgba(121, 147, 170, 0.32);
+      border-radius: 8px;
+      background: rgba(10, 16, 23, 0.78);
+      backdrop-filter: blur(12px);
+      color: #dcecff;
+      font-size: 12px;
+      font-weight: 850;
+      pointer-events: none;
+    }
+    .viewport-badge span {
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+    }
+    .viewport-readout {
+      position: absolute;
+      top: 106px;
+      left: 12px;
+      z-index: 6;
+      display: grid;
+      gap: 5px;
+      min-width: 186px;
+      padding: 9px 10px;
+      border: 1px solid rgba(121, 147, 170, 0.32);
+      border-radius: 8px;
+      background: rgba(10, 16, 23, 0.78);
+      backdrop-filter: blur(12px);
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+    }
+    .readout-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .readout-line strong {
+      color: #e9f2fb;
+      font-weight: 800;
+    }
+    .view-cube {
+      position: absolute;
+      top: 72px;
+      right: 18px;
+      z-index: 6;
+      width: 88px;
+      height: 88px;
+      border: 1px solid rgba(140,165,190,0.34);
+      border-radius: 8px;
+      background: rgba(12,18,26,0.72);
+      backdrop-filter: blur(10px);
+    }
+    .view-cube::before {
+      content: "Z";
+      position: absolute;
+      top: 10px;
+      left: 38px;
+      color: var(--blue);
+      font-weight: 900;
+    }
+    .view-cube::after {
+      content: "X  Y";
+      position: absolute;
+      bottom: 12px;
+      left: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      word-spacing: 10px;
+    }
     .hud {
       position: absolute;
       left: 12px;
+      right: 12px;
       bottom: 12px;
+      z-index: 5;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
-      width: calc(100% - 24px);
       pointer-events: none;
     }
     .hud-chip,
     .legend-chip {
       border: 1px solid rgba(121, 147, 170, 0.32);
-      background: rgba(16, 24, 33, 0.88);
+      background: rgba(14, 22, 31, 0.86);
       border-radius: 8px;
       padding: 10px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
     .hud-label {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       margin-bottom: 7px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
     }
     .hud-value {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 850;
       overflow-wrap: anywhere;
+    }
+    .legend {
+      position: absolute;
+      right: 18px;
+      bottom: 122px;
+      z-index: 5;
+      display: grid;
+      gap: 6px;
+      width: 186px;
+      pointer-events: none;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .camera-inset {
+      position: absolute;
+      left: 12px;
+      bottom: 122px;
+      z-index: 5;
+      width: 238px;
+      border: 1px solid rgba(121, 147, 170, 0.32);
+      border-radius: 8px;
+      background: rgba(10, 16, 23, 0.84);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      pointer-events: none;
+    }
+    .camera-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(121, 147, 170, 0.24);
+      color: #dcecff;
+      font-size: 11px;
+      font-weight: 850;
+    }
+    .camera-feed {
+      position: relative;
+      height: 118px;
+      background:
+        linear-gradient(90deg, rgba(98,182,255,0.14) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(98,182,255,0.12) 1px, transparent 1px),
+        radial-gradient(circle at 34% 56%, rgba(87,214,141,0.38), transparent 10%),
+        radial-gradient(circle at 64% 45%, rgba(242,193,78,0.28), transparent 12%),
+        #0b1118;
+      background-size: 18px 18px, 18px 18px, auto, auto, auto;
+    }
+    .camera-feed::before {
+      content: "";
+      position: absolute;
+      inset: 18px 52px 22px 42px;
+      border: 2px solid var(--green);
+      border-radius: 4px;
+      box-shadow: 0 0 18px rgba(87,214,141,0.32);
+    }
+    .camera-feed::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 46%;
+      height: 2px;
+      background: rgba(98,182,255,0.72);
+      box-shadow: 0 0 16px rgba(98,182,255,0.72);
+    }
+    .camera-foot {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 11px;
+      border-top: 1px solid rgba(121, 147, 170, 0.24);
     }
     .controls {
       display: grid;
       grid-template-columns: auto auto auto auto minmax(180px, 1fr) auto auto;
       gap: 10px;
       align-items: center;
-      padding: 12px 16px;
+      padding: 12px;
       border-top: 1px solid var(--line);
       background: var(--band);
     }
@@ -174,12 +505,48 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       color: var(--text);
       border-radius: 8px;
       padding: 9px 12px;
-      font-weight: 700;
+      font-weight: 750;
       cursor: pointer;
     }
     button:hover { border-color: var(--blue); }
     button.active { border-color: var(--blue); color: var(--blue); background: #17293a; }
     input[type="range"] { width: 100%; accent-color: var(--blue); }
+    .timeline-mini {
+      position: relative;
+      height: 54px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b1118;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .timeline-mini::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0, rgba(98,182,255,0.12) 50%, transparent 100%);
+    }
+    .timeline-marker {
+      position: absolute;
+      top: 9px;
+      bottom: 9px;
+      width: 3px;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 0 14px var(--blue);
+    }
+    .timeline-marker.fail {
+      background: var(--red);
+      box-shadow: 0 0 14px var(--red);
+    }
+    .timeline-cursor {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.65);
+    }
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -190,7 +557,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px;
-      min-height: 82px;
+      min-height: 78px;
     }
     .metric-label {
       color: var(--muted);
@@ -198,16 +565,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       margin-bottom: 8px;
     }
     .metric-value {
-      font-size: 24px;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 850;
       line-height: 1;
-    }
-    .event-list {
-      display: grid;
-      gap: 8px;
-      max-height: 500px;
-      overflow: auto;
-      padding-right: 4px;
     }
     .filter-bar {
       display: grid;
@@ -223,6 +583,13 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border-color: var(--blue);
       color: var(--blue);
       background: #17293a;
+    }
+    .event-list {
+      display: grid;
+      gap: 8px;
+      max-height: 450px;
+      overflow: auto;
+      padding-right: 4px;
     }
     .event {
       border: 1px solid var(--line);
@@ -251,8 +618,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .details {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 12px;
     }
     .log-table {
       width: 100%;
@@ -272,7 +639,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px;
-      max-height: 420px;
+      max-height: 360px;
       overflow: auto;
       font-size: 12px;
       color: #cbd7e3;
@@ -285,60 +652,62 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       line-height: 1.45;
       color: #dcecff;
     }
-    .legend {
-      position: absolute;
-      right: 12px;
-      bottom: 112px;
+    .statusbar {
       display: grid;
-      gap: 6px;
-      width: 178px;
-      pointer-events: none;
-    }
-    .legend-row {
-      display: flex;
-      align-items: center;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
+      margin-top: 8px;
       color: var(--muted);
       font-size: 12px;
     }
-    .swatch {
-      width: 13px;
-      height: 13px;
-      border-radius: 3px;
-      border: 1px solid rgba(255,255,255,0.25);
+    .statusbar span {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--band);
+      padding: 8px 10px;
+      overflow-wrap: anywhere;
     }
     .recording-mode main {
-      width: min(1320px, calc(100vw - 24px));
-      padding-top: 12px;
+      width: min(1440px, calc(100vw - 24px));
+      padding-top: 10px;
     }
     .recording-mode header,
     .recording-mode .details,
-    .recording-mode aside {
+    .recording-mode .status-strip,
+    .recording-mode .statusbar,
+    .recording-mode .left-panel,
+    .recording-mode .right-panel {
       display: none;
     }
-    .recording-mode .layout {
-      grid-template-columns: 1fr;
-    }
-    .recording-mode canvas {
-      height: 780px;
-    }
-    .recording-mode .viewport-shell {
-      min-height: 780px;
-    }
-    @media (max-width: 1120px) {
-      .layout { grid-template-columns: 1fr; }
-      .viewport-shell { min-height: 520px; }
-      canvas { height: 520px; }
-      .details { grid-template-columns: 1fr; }
+    .recording-mode .sim-shell { grid-template-columns: 1fr; }
+    .recording-mode #robotViewport { height: 86vh; }
+    .recording-mode .viewport-panel { min-height: 86vh; }
+    @media (max-width: 1280px) {
+      .sim-shell { grid-template-columns: 1fr; }
+      .left-panel { order: 2; }
+      .right-panel { order: 3; }
       .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 720px) {
-      main { width: min(100vw - 24px, 1480px); padding-top: 18px; }
+      .status-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       header { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      main { width: min(100vw - 20px, 1580px); }
+      header { grid-template-columns: 1fr; }
+      .menu-strip { justify-content: flex-start; }
+      .status-strip, .statusbar { grid-template-columns: 1fr; }
+      .viewport-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        right: auto;
+        max-width: calc(100% - 24px);
+      }
+      .toolbar-group { max-width: 100%; }
+      .viewport-badge { top: 112px; max-width: calc(100% - 24px); }
       .controls { grid-template-columns: 1fr 1fr; }
       .metric-grid { grid-template-columns: 1fr; }
       .hud { grid-template-columns: 1fr; }
-      .legend { display: none; }
+      .legend, .view-cube, .camera-inset, .viewport-readout { display: none; }
+      #robotViewport { height: 560px; }
     }
   </style>
 </head>
@@ -347,30 +716,105 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     <header>
       <div>
         <h1>Dual-Arm Autonomous Microfactory</h1>
-        <p class="subhead">RoboDK/RViz-style replay: two arms assemble a mini conveyor, visualize planned motion, detect failures, recover, and produce acceptance evidence.</p>
+        <div class="app-caption">RoboDK/RViz-style Three.js workcell replay</div>
       </div>
+      <nav class="menu-strip" aria-label="Application toolbar">
+        <span class="menu-item">Planning Scene</span>
+        <span class="menu-item">Motion Replay</span>
+        <span class="menu-item">Perception</span>
+        <span class="menu-item">Evidence</span>
+      </nav>
       <div id="final-pill" class="pill">RUN</div>
     </header>
 
-    <section class="layout">
-      <div class="panel">
-        <div class="viewport-shell">
-          <canvas id="robotViewport" width="1400" height="860" aria-label="Robotics workcell viewport"></canvas>
+    <section class="status-strip" aria-label="Run status">
+      <div class="status-cell">
+        <div class="status-k">Scenario</div>
+        <div class="status-v" id="scenarioName">conveyor recovery</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-k">Planner</div>
+        <div class="status-v" id="plannerHealth">deterministic</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-k">Clearance</div>
+        <div class="status-v" id="clearanceReadout">-- mm</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-k">Vision Confidence</div>
+        <div class="status-v" id="confidenceReadout">--</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-k">Robot Mode</div>
+        <div class="status-v" id="robotMode">ready</div>
+      </div>
+    </section>
+
+    <section class="sim-shell">
+      <aside class="panel left-panel">
+        <div class="panel-header">
+          <div class="panel-title">Displays</div>
+        </div>
+        <div class="panel-body">
+          <div class="display-list">
+            <div class="display-row"><span class="display-check"></span><span>Planning scene</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"></span><span>Robot links</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"></span><span>Safety envelopes</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"></span><span>Camera frustum</span><span>on</span></div>
+            <div class="display-row"><span class="display-check"></span><span>Toolpath waypoints</span><span>on</span></div>
+          </div>
+        </div>
+        <div class="panel-header">
+          <div class="panel-title">Scene Tree</div>
+        </div>
+        <div class="panel-body">
+          <div class="scene-tree" id="sceneTree"></div>
+        </div>
+        <div class="panel-header">
+          <div class="panel-title">Planning Stack</div>
+        </div>
+        <div class="panel-body">
+          <div class="stack-list" id="planningStack"></div>
+        </div>
+        <div class="panel-header">
+          <div class="panel-title">Run Metrics</div>
+        </div>
+        <div class="panel-body">
+          <div class="metric-grid" id="metrics"></div>
+        </div>
+      </aside>
+
+      <section class="panel viewport-panel">
+        <div id="robotViewport" aria-label="Three.js robotics workcell viewport">
           <div class="viewport-toolbar">
-            <div>
+            <div class="toolbar-group">
               <button class="active" data-view="iso">Iso</button>
               <button data-view="top">Top</button>
               <button data-view="side">Side</button>
+              <button data-view="front">Front</button>
             </div>
-            <div>
+            <div class="toolbar-group">
               <button id="fitViewBtn">Fit View</button>
+              <button id="ghostBtn" class="active">Ghosts</button>
             </div>
           </div>
+          <div class="viewport-badge"><span>World</span> MoveIt-style planning scene</div>
+          <div class="viewport-readout">
+            <div class="readout-line"><span>left TCP</span><strong id="leftTcpReadout">--</strong></div>
+            <div class="readout-line"><span>right TCP</span><strong id="rightTcpReadout">--</strong></div>
+            <div class="readout-line"><span>target</span><strong id="targetReadout">none</strong></div>
+          </div>
+          <div class="view-cube"></div>
           <div class="legend legend-chip">
             <div class="legend-row"><span class="swatch" style="background:#62b6ff"></span>left arm</div>
             <div class="legend-row"><span class="swatch" style="background:#b99cff"></span>right arm</div>
-            <div class="legend-row"><span class="swatch" style="background:#57d68d"></span>accepted</div>
-            <div class="legend-row"><span class="swatch" style="background:#ff6b6b"></span>fault</div>
+            <div class="legend-row"><span class="swatch" style="background:#57d68d"></span>accepted state</div>
+            <div class="legend-row"><span class="swatch" style="background:#ff6b6b"></span>fault state</div>
+          </div>
+          <div class="camera-inset">
+            <div class="camera-head"><span>RGB-D / pose estimate</span><span id="cameraState">idle</span></div>
+            <div class="camera-feed"></div>
+            <div class="camera-foot"><span id="visionMode">waiting for detection</span><strong id="visionConfidence">--</strong></div>
           </div>
           <div class="hud">
             <div class="hud-chip">
@@ -406,15 +850,20 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
           <button id="recordingModeBtn">Recording</button>
           <span id="stepLabel" class="muted">0 / 0</span>
         </div>
-      </div>
+      </section>
 
-      <aside class="panel">
-        <div class="panel-body">
-          <h2>Run Metrics</h2>
-          <div class="metric-grid" id="metrics"></div>
+      <aside class="panel right-panel">
+        <div class="panel-header">
+          <div class="panel-title">Live Inspector</div>
         </div>
-        <div class="panel-body" style="border-top: 1px solid var(--line);">
-          <h2>Replay Timeline</h2>
+        <div class="panel-body">
+          <div class="inspector-list" id="eventInspector"></div>
+        </div>
+        <div class="panel-header">
+          <div class="panel-title">Replay Timeline</div>
+        </div>
+        <div class="panel-body">
+          <div class="timeline-mini" id="timelineMini"></div>
           <div class="filter-bar" id="filterBar">
             <button class="active" data-filter="all">All</button>
             <button data-filter="critical">Critical</button>
@@ -431,9 +880,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         <div class="panel-body">
           <h2>What This Proves</h2>
           <div class="callout">
-            This is not a happy-path pick-and-place. The replay visualizes tool motion,
-            planned paths, perception confidence, bimanual stabilization, autonomous recovery,
-            and the final functional test from generated event data.
+            The replay is rendered from generated event data: planned paths, pose estimates,
+            bimanual stabilization, robot-link motion, failure detection, recovery, and final
+            functional acceptance.
           </div>
           <div style="margin-top: 12px;">
             <button id="copySummaryBtn">Copy Run Summary</button>
@@ -456,122 +905,377 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         </div>
       </div>
     </section>
+    <footer class="statusbar">
+      <span>Renderer: Three.js WebGL, local vendor bundle</span>
+      <span>Scene: generated from deterministic event log</span>
+      <span>Control: scrub, replay, jump critical, orbit, zoom</span>
+      <span>Artifacts: metrics, event JSON, acceptance report</span>
+    </footer>
   </main>
 
-  <script>
+  <script type="module">
+    import * as THREE from "./assets/vendor/three/three.module.min.js";
+
     const payload = __PAYLOAD__;
     const events = payload.events;
-    const canvas = document.getElementById("robotViewport");
-    const ctx = canvas.getContext("2d");
+    const viewport = document.getElementById("robotViewport");
     let index = 0;
     let playing = false;
     let timer = null;
     let playbackMs = 420;
     let eventFilter = "all";
-    let viewMode = "iso";
-    let animationFrame = null;
+    let showGhosts = true;
+    let tween = null;
+    let cameraTarget = new THREE.Vector3(0, 0.18, 0.35);
+    let orbit = { yaw: -0.78, pitch: 0.58, radius: 6.2 };
+    let dragging = false;
+    let lastPointer = { x: 0, y: 0 };
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
     const criticalPhases = new Set(["active_vision", "bimanual_coordination", "functional_test"]);
     const colors = {
-      left: "#62b6ff",
-      right: "#b99cff",
-      accepted: "#57d68d",
-      warning: "#f2c14e",
-      fault: "#ff6b6b",
-      grid: "rgba(128, 159, 184, 0.22)",
-      text: "#dce7f2",
-      muted: "#8da0b2",
-      base: "#6ee7e7",
-      roller: "#f2c14e",
-      belt: "#57d68d",
-      motor: "#b99cff",
-      sensor: "#62b6ff",
+      blue: 0x62b6ff,
+      left: 0x62b6ff,
+      right: 0xb99cff,
+      accepted: 0x57d68d,
+      warning: 0xf2c14e,
+      fault: 0xff6b6b,
+      orange: 0xff9f43,
+      cyan: 0x6ee7e7,
+      motor: 0xb99cff,
+      sensor: 0x62b6ff,
+      steel: 0x9fb3c6,
+      dark: 0x151f2a,
+      floor: 0x0f151d,
     };
 
-    const world = {
-      leftBase: { x: -2.7, y: 1.35, z: 0 },
-      rightBase: { x: 2.7, y: 1.35, z: 0 },
-      tray: { x: -2.45, y: -0.75, z: 0 },
-      reject: { x: 2.45, y: -0.75, z: 0 },
-      fixture: { x: 0, y: 0, z: 0 },
-      camera: { x: 0, y: -2.1, z: 2.9 },
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x080c11);
+    scene.fog = new THREE.Fog(0x080c11, 6, 14);
+
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.05, 80);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    viewport.prepend(renderer.domElement);
+
+    const ambient = new THREE.HemisphereLight(0xeaf6ff, 0x17202a, 1.4);
+    scene.add(ambient);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.7);
+    keyLight.position.set(-3.8, -4.5, 7.5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    scene.add(keyLight);
+    const rim = new THREE.DirectionalLight(0x62b6ff, 1.2);
+    rim.position.set(4, 2, 5);
+    scene.add(rim);
+
+    const materials = {
+      floor: new THREE.MeshStandardMaterial({ color: colors.floor, roughness: 0.78, metalness: 0.12 }),
+      tray: new THREE.MeshStandardMaterial({ color: 0x172330, roughness: 0.64, metalness: 0.22 }),
+      fixture: new THREE.MeshStandardMaterial({ color: 0x22303e, roughness: 0.58, metalness: 0.35 }),
+      fixtureOk: new THREE.MeshStandardMaterial({ color: colors.accepted, roughness: 0.45, metalness: 0.25 }),
+      fixtureFault: new THREE.MeshStandardMaterial({ color: colors.fault, roughness: 0.55, metalness: 0.18 }),
+      left: new THREE.MeshStandardMaterial({ color: colors.left, roughness: 0.42, metalness: 0.48 }),
+      right: new THREE.MeshStandardMaterial({ color: colors.right, roughness: 0.42, metalness: 0.48 }),
+      cyan: new THREE.MeshStandardMaterial({ color: colors.cyan, roughness: 0.38, metalness: 0.18 }),
+      roller: new THREE.MeshStandardMaterial({ color: colors.warning, roughness: 0.32, metalness: 0.35 }),
+      belt: new THREE.MeshStandardMaterial({ color: colors.accepted, roughness: 0.7, metalness: 0.06 }),
+      beltFault: new THREE.MeshStandardMaterial({ color: colors.fault, roughness: 0.65, metalness: 0.06 }),
+      motor: new THREE.MeshStandardMaterial({ color: colors.motor, roughness: 0.5, metalness: 0.38 }),
+      sensor: new THREE.MeshStandardMaterial({ color: colors.sensor, roughness: 0.48, metalness: 0.2 }),
+      ghost: new THREE.MeshStandardMaterial({ color: 0x8aa1b5, roughness: 0.62, metalness: 0.1, transparent: true, opacity: 0.22 }),
+      rail: new THREE.MeshStandardMaterial({ color: 0x5f7080, roughness: 0.38, metalness: 0.55 }),
+      clamp: new THREE.MeshStandardMaterial({ color: colors.orange, roughness: 0.42, metalness: 0.32 }),
+      glass: new THREE.MeshStandardMaterial({ color: colors.blue, roughness: 0.18, metalness: 0.05, transparent: true, opacity: 0.14, side: THREE.DoubleSide }),
+      envelopeLeft: new THREE.MeshBasicMaterial({ color: colors.left, transparent: true, opacity: 0.075, wireframe: true }),
+      envelopeRight: new THREE.MeshBasicMaterial({ color: colors.right, transparent: true, opacity: 0.075, wireframe: true }),
+      waypoint: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 }),
+      target: new THREE.MeshStandardMaterial({ color: colors.orange, emissive: colors.orange, emissiveIntensity: 0.55, roughness: 0.35, metalness: 0.08 }),
+      towerGreen: new THREE.MeshStandardMaterial({ color: colors.accepted, emissive: colors.accepted, emissiveIntensity: 0.55, roughness: 0.28 }),
+      towerYellow: new THREE.MeshStandardMaterial({ color: colors.warning, emissive: colors.warning, emissiveIntensity: 0.35, roughness: 0.28 }),
+      towerRed: new THREE.MeshStandardMaterial({ color: colors.fault, emissive: colors.fault, emissiveIntensity: 0.35, roughness: 0.28 }),
+      path: new THREE.LineBasicMaterial({ color: colors.left, transparent: true, opacity: 0.95 }),
+      faultLine: new THREE.LineBasicMaterial({ color: colors.fault, transparent: true, opacity: 0.95 }),
+      pose: new THREE.LineBasicMaterial({ color: colors.warning }),
+      camera: new THREE.LineBasicMaterial({ color: colors.left, transparent: true, opacity: 0.42 }),
     };
 
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.max(900, Math.floor(rect.width * ratio));
-      canvas.height = Math.max(520, Math.floor(rect.height * ratio));
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      drawScene();
+    const objects = {};
+    const groups = {
+      cell: new THREE.Group(),
+      parts: new THREE.Group(),
+      robots: new THREE.Group(),
+      overlays: new THREE.Group(),
+      ghosts: new THREE.Group(),
+    };
+    Object.values(groups).forEach((group) => scene.add(group));
+
+    initScene();
+    initInteraction();
+
+    function initScene() {
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(8.8, 5.4), materials.floor);
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      groups.cell.add(floor);
+
+      const grid = new THREE.GridHelper(8.8, 22, 0x4d647a, 0x233240);
+      grid.material.transparent = true;
+      grid.material.opacity = 0.68;
+      groups.cell.add(grid);
+      groups.cell.add(new THREE.AxesHelper(1.25));
+
+      objects.tray = addBox(groups.cell, [-2.6, 0.06, -0.72], [1.5, 0.16, 1.25], materials.tray);
+      objects.reject = addBox(groups.cell, [2.6, 0.06, -0.72], [1.5, 0.16, 1.25], materials.tray);
+      objects.fixture = addBox(groups.cell, [0, 0.18, 0], [1.45, 0.34, 1.0], materials.fixture);
+      createWorkcellHardware();
+
+      addLabel("loose parts", [-3.23, 0.24, -1.34]);
+      addLabel("installed / reject", [1.95, 0.24, -1.34]);
+      addLabel("fixture", [-0.38, 0.62, -0.68]);
+
+      createLooseParts();
+      createInstalledParts();
+      createRobots();
+      createCameraFrustum();
+      createOverlayObjects();
+      setGhostVisibility(true);
     }
 
-    function setText(id, value) {
-      el(id).textContent = value;
+    function addBox(parent, position, scale, material) {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(scale[0], scale[1], scale[2]), material);
+      mesh.position.set(position[0], position[1], position[2]);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      parent.add(mesh);
+      return mesh;
     }
 
-    function isCritical(event) {
-      return event.status !== "pass" || criticalPhases.has(event.phase);
+    function addCylinder(parent, position, radius, depth, material, axis = "x") {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, depth, 32), material);
+      mesh.position.set(position[0], position[1], position[2]);
+      if (axis === "x") mesh.rotation.z = Math.PI / 2;
+      if (axis === "z") mesh.rotation.x = Math.PI / 2;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      parent.add(mesh);
+      return mesh;
     }
 
-    function isPlanning(event) {
-      return event.phase === "motion_planning" || event.phase === "grasp_planning";
+    function createWorkcellHardware() {
+      addBox(groups.cell, [0, 0.09, 0], [2.24, 0.08, 1.52], materials.rail);
+      addBox(groups.cell, [-0.74, 0.43, -0.58], [0.12, 0.22, 0.18], materials.clamp);
+      addBox(groups.cell, [0.74, 0.43, -0.58], [0.12, 0.22, 0.18], materials.clamp);
+      addBox(groups.cell, [-0.74, 0.43, 0.58], [0.12, 0.22, 0.18], materials.clamp);
+      addBox(groups.cell, [0.74, 0.43, 0.58], [0.12, 0.22, 0.18], materials.clamp);
+      addCylinder(groups.cell, [0, 0.7, -0.58], 0.035, 1.42, materials.rail, "x");
+      addCylinder(groups.cell, [0, 0.7, 0.58], 0.035, 1.42, materials.rail, "x");
+
+      const fence = addBox(groups.overlays, [0, 0.74, 1.88], [5.8, 1.24, 0.04], materials.glass);
+      fence.castShadow = false;
+      fence.receiveShadow = false;
+      addBox(groups.cell, [3.42, 0.62, 1.16], [0.08, 1.24, 0.08], materials.rail);
+      addBox(groups.cell, [-3.42, 0.62, 1.16], [0.08, 1.24, 0.08], materials.rail);
+
+      addCylinder(groups.cell, [3.32, 0.82, -1.58], 0.035, 1.28, materials.rail, "y");
+      objects.towerRed = addCylinder(groups.cell, [3.32, 1.54, -1.58], 0.095, 0.12, materials.towerRed, "y");
+      objects.towerYellow = addCylinder(groups.cell, [3.32, 1.39, -1.58], 0.095, 0.12, materials.towerYellow, "y");
+      objects.towerGreen = addCylinder(groups.cell, [3.32, 1.24, -1.58], 0.095, 0.12, materials.towerGreen, "y");
+
+      objects.leftEnvelope = createEnvelope([-2.65, 0.22, 1.28], materials.envelopeLeft);
+      objects.rightEnvelope = createEnvelope([2.65, 0.22, 1.28], materials.envelopeRight);
     }
 
-    function filteredEvents() {
-      if (eventFilter === "critical") {
-        return events.map((event, i) => [event, i]).filter(([event]) => isCritical(event));
-      }
-      if (eventFilter === "recovery") {
-        return events.map((event, i) => [event, i]).filter(([event]) => event.status === "recovered" || event.phase === "recovery");
-      }
-      if (eventFilter === "planning") {
-        return events.map((event, i) => [event, i]).filter(([event]) => isPlanning(event));
-      }
-      return events.map((event, i) => [event, i]);
+    function createEnvelope(position, material) {
+      const envelope = new THREE.Mesh(new THREE.SphereGeometry(1.72, 32, 18, 0, Math.PI * 2, 0, Math.PI * 0.72), material);
+      envelope.position.set(position[0], position[1], position[2]);
+      envelope.scale.set(1.08, 0.72, 1.08);
+      groups.overlays.add(envelope);
+      return envelope;
     }
 
-    function currentEvent() {
-      return events[Math.max(0, Math.min(index, events.length - 1))];
+    function createLooseParts() {
+      objects.looseBase = addBox(groups.parts, [-2.88, 0.25, -1.02], [0.82, 0.13, 0.28], materials.cyan);
+      objects.looseRollerA = addCylinder(groups.parts, [-3.03, 0.28, -0.5], 0.12, 0.34, materials.roller, "x");
+      objects.looseRollerB = addCylinder(groups.parts, [-2.35, 0.28, -0.48], 0.12, 0.34, materials.roller, "x");
+      objects.looseBelt = createBelt(groups.parts, [-2.67, 0.28, 0.08], 0.72, 0.34, materials.belt);
+      objects.looseMotor = addBox(groups.parts, [-3.06, 0.32, 0.7], [0.34, 0.36, 0.34], materials.motor);
+      objects.looseSensor = addBox(groups.parts, [-2.2, 0.27, 0.72], [0.34, 0.18, 0.26], materials.sensor);
     }
 
-    function project(point) {
-      const rect = canvas.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
-      const scale = Math.min(w / 7.2, h / 5.1);
-      const cx = w * 0.5;
-      const cy = h * 0.61;
-      if (viewMode === "top") {
-        return { x: cx + point.x * scale, y: cy + point.y * scale, z: point.z };
-      }
-      if (viewMode === "side") {
-        return { x: cx + point.x * scale, y: cy - point.z * scale * 0.9 + point.y * scale * 0.12, z: point.z };
-      }
-      return {
-        x: cx + (point.x - point.y) * scale * 0.78,
-        y: cy + (point.x + point.y) * scale * 0.36 - point.z * scale * 0.9,
-        z: point.z,
-      };
+    function createInstalledParts() {
+      objects.base = addBox(groups.parts, [0, 0.46, 0], [1.15, 0.12, 0.36], materials.cyan);
+      objects.rollerA = addCylinder(groups.parts, [-0.42, 0.62, 0], 0.11, 0.42, materials.roller, "x");
+      objects.rollerB = addCylinder(groups.parts, [0.42, 0.62, 0], 0.11, 0.42, materials.roller, "x");
+      objects.belt = createBelt(groups.parts, [0, 0.65, 0], 1.02, 0.36, materials.belt);
+      objects.motor = addBox(groups.parts, [0.78, 0.57, 0.02], [0.28, 0.28, 0.3], materials.motor);
+      objects.sensor = addBox(groups.parts, [-0.72, 0.54, 0.36], [0.28, 0.14, 0.22], materials.sensor);
+      objects.puck = new THREE.Mesh(new THREE.SphereGeometry(0.075, 24, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.28, metalness: 0.08 }));
+      objects.puck.castShadow = true;
+      groups.parts.add(objects.puck);
+      ["base", "rollerA", "rollerB", "belt", "motor", "sensor", "puck"].forEach((key) => objects[key].visible = false);
+
+      objects.baseGhost = addBox(groups.ghosts, [0, 0.46, 0], [1.15, 0.12, 0.36], materials.ghost);
+      objects.rollerAGhost = addCylinder(groups.ghosts, [-0.42, 0.62, 0], 0.11, 0.42, materials.ghost, "x");
+      objects.rollerBGhost = addCylinder(groups.ghosts, [0.42, 0.62, 0], 0.11, 0.42, materials.ghost, "x");
+      objects.beltGhost = createBelt(groups.ghosts, [0, 0.65, 0], 1.02, 0.36, materials.ghost);
+      objects.motorGhost = addBox(groups.ghosts, [0.78, 0.57, 0.02], [0.28, 0.28, 0.3], materials.ghost);
+      objects.sensorGhost = addBox(groups.ghosts, [-0.72, 0.54, 0.36], [0.28, 0.14, 0.22], materials.ghost);
+    }
+
+    function createBelt(parent, position, width, depth, material) {
+      const group = new THREE.Group();
+      group.position.set(position[0], position[1], position[2]);
+      const front = addBox(group, [0, 0, -depth / 2], [width, 0.035, 0.045], material);
+      const back = addBox(group, [0, 0, depth / 2], [width, 0.035, 0.045], material);
+      const left = addCylinder(group, [-width / 2, 0, 0], 0.06, depth, material, "z");
+      const right = addCylinder(group, [width / 2, 0, 0], 0.06, depth, material, "z");
+      parent.add(group);
+      return group;
+    }
+
+    function createRobots() {
+      objects.leftRobot = createRobot("left", [-2.65, 0, 1.28], materials.left);
+      objects.rightRobot = createRobot("right", [2.65, 0, 1.28], materials.right);
+      groups.robots.add(objects.leftRobot.group);
+      groups.robots.add(objects.rightRobot.group);
+    }
+
+    function createRobot(name, basePosition, material) {
+      const group = new THREE.Group();
+      const base = addCylinder(group, basePosition, 0.28, 0.18, material, "y");
+      const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 16), material);
+      shoulder.castShadow = true;
+      group.add(shoulder);
+      const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), material);
+      elbow.castShadow = true;
+      group.add(elbow);
+      const wrist = new THREE.Mesh(new THREE.SphereGeometry(0.105, 24, 16), material);
+      wrist.castShadow = true;
+      group.add(wrist);
+      const upper = createLink(material);
+      const forearm = createLink(material);
+      const tool = addBox(group, [0, 0, 0], [0.22, 0.09, 0.14], material);
+      return { group, base, shoulder, elbow, wrist, upper, forearm, tool, basePosition: new THREE.Vector3(...basePosition) };
+    }
+
+    function createLink(material) {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 1, 24), material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      groups.robots.add(mesh);
+      return mesh;
+    }
+
+    function createCameraFrustum() {
+      const points = [
+        new THREE.Vector3(0, 2.75, -1.95),
+        new THREE.Vector3(-1.25, 0.02, -0.78),
+        new THREE.Vector3(1.25, 0.02, -0.78),
+        new THREE.Vector3(1.25, 0.02, 0.92),
+        new THREE.Vector3(-1.25, 0.02, 0.92),
+      ];
+      const edges = [0,1, 0,2, 0,3, 0,4, 1,2, 2,3, 3,4, 4,1];
+      const vertices = [];
+      for (let i = 0; i < edges.length; i += 1) vertices.push(points[edges[i]]);
+      const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+      objects.cameraFrustum = new THREE.LineSegments(geometry, materials.camera);
+      groups.overlays.add(objects.cameraFrustum);
+      const cameraBody = addBox(groups.overlays, [0, 2.75, -1.95], [0.55, 0.26, 0.22], materials.sensor);
+      cameraBody.rotation.x = -0.25;
+      addLabel("RGB-D", [0.28, 2.62, -1.95]);
+    }
+
+    function createOverlayObjects() {
+      objects.pathLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), materials.path);
+      groups.overlays.add(objects.pathLine);
+      objects.pathLine.visible = false;
+      objects.waypoints = new THREE.Group();
+      groups.overlays.add(objects.waypoints);
+      objects.targetMarker = new THREE.Mesh(new THREE.SphereGeometry(0.095, 24, 16), materials.target);
+      objects.targetMarker.visible = false;
+      groups.overlays.add(objects.targetMarker);
+
+      objects.poseCrosshair = new THREE.Group();
+      const axes = [
+        [new THREE.Vector3(-0.16, 0, 0), new THREE.Vector3(0.16, 0, 0)],
+        [new THREE.Vector3(0, -0.16, 0), new THREE.Vector3(0, 0.16, 0)],
+        [new THREE.Vector3(0, 0, -0.16), new THREE.Vector3(0, 0, 0.16)],
+      ];
+      axes.forEach(([a, b]) => {
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), materials.pose);
+        objects.poseCrosshair.add(line);
+      });
+      objects.poseCrosshair.visible = false;
+      groups.overlays.add(objects.poseCrosshair);
+    }
+
+    function addLabel(text, position) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 64;
+      const c = canvas.getContext("2d");
+      c.fillStyle = "rgba(12,18,26,0.76)";
+      c.roundRect(0, 0, 256, 64, 10);
+      c.fill();
+      c.fillStyle = "#d9e6f2";
+      c.font = "700 24px Segoe UI, Arial";
+      c.fillText(text, 18, 40);
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(material);
+      sprite.position.set(position[0], position[1], position[2]);
+      sprite.scale.set(0.62, 0.16, 1);
+      groups.overlays.add(sprite);
+      return sprite;
+    }
+
+    function updateRobot(robot, toolPoint) {
+      const base = robot.basePosition;
+      const shoulder = new THREE.Vector3(base.x, 0.42, base.z);
+      const target = new THREE.Vector3(toolPoint.x, toolPoint.y, toolPoint.z);
+      const elbow = new THREE.Vector3().lerpVectors(shoulder, target, 0.48);
+      elbow.y += 0.82;
+      robot.shoulder.position.copy(shoulder);
+      robot.elbow.position.copy(elbow);
+      robot.wrist.position.copy(target);
+      robot.tool.position.copy(target);
+      alignCylinder(robot.upper, shoulder, elbow);
+      alignCylinder(robot.forearm, elbow, target);
+      robot.tool.lookAt(elbow);
+    }
+
+    function alignCylinder(mesh, a, b) {
+      const midpoint = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
+      const direction = new THREE.Vector3().subVectors(b, a);
+      mesh.position.copy(midpoint);
+      mesh.scale.set(1, direction.length(), 1);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
     }
 
     function sceneState(eventIndex = index) {
       const state = {
         installed: new Set(),
         hiddenLoose: new Set(),
-        beltColor: colors.belt,
-        fixtureColor: "#526b7f",
-        leftTool: { x: -1.25, y: 0.25, z: 1.35 },
-        rightTool: { x: 1.25, y: 0.25, z: 1.35 },
-        leftTarget: null,
-        rightTarget: null,
+        beltFault: false,
+        fixtureMode: "normal",
+        leftTool: { x: -1.2, y: 0.95, z: 0.78 },
+        rightTool: { x: 1.2, y: 0.95, z: 0.78 },
         plannedPath: null,
         cameraPulse: false,
         activePose: null,
         puckProgress: 0,
         status: "idle",
+        lastDetection: null,
+        lastPlan: null,
+        lastGrasp: null,
+        lastAssist: null,
       };
 
       for (let i = 0; i <= eventIndex; i += 1) {
@@ -579,50 +1283,39 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         const msg = event.message.toLowerCase();
         const details = event.details || {};
         state.status = event.status;
-        if (event.status === "fail") {
-          state.fixtureColor = colors.fault;
-        } else if (event.status === "recovered") {
-          state.fixtureColor = colors.left;
-        }
+        if (event.status === "fail") state.fixtureMode = "fault";
+        if (event.status === "recovered") state.fixtureMode = "recovered";
         if (event.phase === "perception" || event.phase === "active_vision") {
           state.cameraPulse = true;
-          const detection = details.detection;
-          if (detection) {
-            state.activePose = poseToWorld(detection.pose, detection.kind);
+          if (details.detection) {
+            state.lastDetection = details.detection;
+            state.activePose = poseToWorld(details.detection.kind);
           }
+        }
+        if (event.phase === "grasp_planning" && details.grasp) {
+          state.lastGrasp = details.grasp;
         }
         if (event.phase === "motion_planning" && details.plan) {
           const target = planTargetToWorld(details.plan);
+          state.lastPlan = details.plan;
           state.plannedPath = {
             arm: details.plan.arm,
             start: details.plan.arm === "left_arm" ? state.leftTool : state.rightTool,
             target,
-            clearance: details.plan.min_clearance_mm,
             status: details.plan.status,
+            clearance: details.plan.min_clearance_mm,
           };
-          if (details.plan.arm === "left_arm") {
-            state.leftTarget = target;
-            state.leftTool = target;
-          } else {
-            state.rightTarget = target;
-            state.rightTool = target;
-          }
+          if (details.plan.arm === "left_arm") state.leftTool = target;
+          if (details.plan.arm === "right_arm") state.rightTool = target;
         }
         if (event.phase === "bimanual_coordination") {
-          if (details.assist_arm === "left_arm") {
-            state.leftTool = { x: -0.42, y: 0.05, z: 0.75 };
-          }
-          if (details.assist_arm === "right_arm") {
-            state.rightTool = { x: 0.42, y: 0.05, z: 0.75 };
-          }
+          if (details.assist_arm) state.lastAssist = details.assist_arm;
+          if (details.assist_arm === "left_arm") state.leftTool = { x: -0.42, y: 0.8, z: -0.18 };
+          if (details.assist_arm === "right_arm") state.rightTool = { x: 0.42, y: 0.8, z: -0.18 };
         }
         if (event.phase === "execution") {
-          if (msg.includes("left_arm")) {
-            state.leftTool = { x: -0.28, y: -0.02, z: 0.62 };
-          }
-          if (msg.includes("right_arm")) {
-            state.rightTool = { x: 0.28, y: -0.02, z: 0.62 };
-          }
+          if (msg.includes("left_arm")) state.leftTool = { x: -0.25, y: 0.78, z: 0.0 };
+          if (msg.includes("right_arm")) state.rightTool = { x: 0.25, y: 0.78, z: 0.0 };
         }
         if (msg.includes("installed base")) {
           state.hiddenLoose.add("base");
@@ -640,10 +1333,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         if (msg.includes("belt placed") || msg.includes("belt slip")) {
           state.hiddenLoose.add("belt");
           state.installed.add("belt");
-          state.beltColor = event.status === "fail" ? colors.fault : colors.belt;
+          state.beltFault = event.status === "fail";
         }
         if (msg.includes("re-tensioning")) {
-          state.beltColor = colors.left;
+          state.beltFault = false;
         }
         if (msg.includes("installed motor")) {
           state.hiddenLoose.add("motor");
@@ -654,11 +1347,121 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
           state.installed.add("sensor");
         }
         if (event.phase === "functional_test" && event.status === "pass") {
-          state.fixtureColor = colors.accepted;
+          state.fixtureMode = "accepted";
           state.puckProgress = 1;
         }
       }
       return state;
+    }
+
+    function poseToWorld(kind) {
+      return {
+        base_plate: new THREE.Vector3(-2.88, 0.58, -1.02),
+        roller: new THREE.Vector3(-2.68, 0.58, -0.49),
+        belt: new THREE.Vector3(-2.67, 0.58, 0.08),
+        motor: new THREE.Vector3(-3.06, 0.62, 0.7),
+        sensor: new THREE.Vector3(-2.2, 0.58, 0.72),
+      }[kind] || new THREE.Vector3(-2.5, 0.58, -0.3);
+    }
+
+    function planTargetToWorld(plan) {
+      const target = plan.target || {};
+      const x = Number(target.x ?? 0);
+      const y = Number(target.y ?? 0);
+      const z = Number(target.z ?? 0.2);
+      if (Math.abs(x) < 0.03 && Math.abs(y) < 0.03) {
+        return { x: plan.arm === "left_arm" ? -0.18 : 0.18, y: 0.9, z: 0.05 };
+      }
+      return {
+        x: Math.max(-3.05, Math.min(3.05, (x - 0.35) * 6.0)),
+        y: Math.max(0.45, Math.min(1.4, z * 5.2)),
+        z: Math.max(-1.25, Math.min(1.25, (y - 0.42) * 4.8)),
+      };
+    }
+
+    function setGhostVisibility(visible) {
+      groups.ghosts.visible = visible;
+    }
+
+    function applySceneState(state) {
+      objects.fixture.material = state.fixtureMode === "accepted"
+        ? materials.fixtureOk
+        : state.fixtureMode === "fault"
+          ? materials.fixtureFault
+          : materials.fixture;
+
+      objects.looseBase.visible = !state.hiddenLoose.has("base");
+      objects.looseRollerA.visible = !state.hiddenLoose.has("rollerA");
+      objects.looseRollerB.visible = !state.hiddenLoose.has("rollerB");
+      objects.looseBelt.visible = !state.hiddenLoose.has("belt");
+      objects.looseMotor.visible = !state.hiddenLoose.has("motor");
+      objects.looseSensor.visible = !state.hiddenLoose.has("sensor");
+
+      objects.base.visible = state.installed.has("base");
+      objects.rollerA.visible = state.installed.has("rollerA");
+      objects.rollerB.visible = state.installed.has("rollerB");
+      objects.belt.visible = state.installed.has("belt");
+      objects.belt.children.forEach((child) => child.material = state.beltFault ? materials.beltFault : materials.belt);
+      objects.motor.visible = state.installed.has("motor");
+      objects.sensor.visible = state.installed.has("sensor");
+      objects.puck.visible = state.puckProgress > 0;
+      objects.puck.position.set(-0.42 + state.puckProgress * 0.84, 0.78, 0.12);
+      objects.towerRed.visible = state.fixtureMode === "fault";
+      objects.towerYellow.visible = state.fixtureMode === "recovered";
+      objects.towerGreen.visible = state.fixtureMode === "accepted" || state.fixtureMode === "normal";
+
+      objects.cameraFrustum.material.opacity = state.cameraPulse ? 0.78 : 0.32;
+      updateRobot(objects.leftRobot, state.leftTool);
+      updateRobot(objects.rightRobot, state.rightTool);
+      updatePath(state);
+      updatePoseCrosshair(state);
+      renderSceneTree(state);
+      renderPlanningStack(state);
+      updateToolReadouts(state);
+    }
+
+    function updatePath(state) {
+      if (!state.plannedPath) {
+        objects.pathLine.visible = false;
+        objects.targetMarker.visible = false;
+        clearGroup(objects.waypoints);
+        return;
+      }
+      const path = state.plannedPath;
+      const points = [
+        new THREE.Vector3(path.start.x, path.start.y, path.start.z),
+        new THREE.Vector3((path.start.x + path.target.x) / 2, Math.max(path.start.y, path.target.y) + 0.45, (path.start.z + path.target.z) / 2),
+        new THREE.Vector3(path.target.x, path.target.y, path.target.z),
+      ];
+      objects.pathLine.geometry.dispose();
+      objects.pathLine.geometry = new THREE.BufferGeometry().setFromPoints(points);
+      objects.pathLine.material = path.status === "warn" ? materials.faultLine : materials.path;
+      objects.pathLine.visible = true;
+      objects.targetMarker.visible = true;
+      objects.targetMarker.position.copy(points[2]);
+      clearGroup(objects.waypoints);
+      points.forEach((point, i) => {
+        const marker = new THREE.Mesh(new THREE.SphereGeometry(i === 2 ? 0.052 : 0.038, 16, 10), materials.waypoint);
+        marker.position.copy(point);
+        objects.waypoints.add(marker);
+      });
+    }
+
+    function clearGroup(group) {
+      while (group.children.length > 0) {
+        const child = group.children[0];
+        group.remove(child);
+        if (child.geometry) child.geometry.dispose();
+      }
+    }
+
+    function updatePoseCrosshair(state) {
+      if (!state.activePose) {
+        objects.poseCrosshair.visible = false;
+        return;
+      }
+      objects.poseCrosshair.visible = true;
+      objects.poseCrosshair.position.copy(state.activePose);
     }
 
     function lerp(a, b, t) {
@@ -677,7 +1480,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       };
     }
 
-    function lerpScene(from, to, t) {
+    function lerpState(from, to, t) {
       const eased = easeInOut(t);
       return {
         ...to,
@@ -687,281 +1490,23 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       };
     }
 
-    function poseToWorld(pose, kind) {
-      const kindOffsets = {
-        base_plate: { x: -2.45, y: -0.95, z: 0.1 },
-        roller: { x: -2.55, y: -0.45, z: 0.16 },
-        belt: { x: -2.35, y: 0.08, z: 0.14 },
-        motor: { x: -2.75, y: 0.65, z: 0.18 },
-        sensor: { x: -2.08, y: 0.68, z: 0.16 },
-      };
-      return kindOffsets[kind] || { x: -2.35, y: -0.5, z: 0.2 };
-    }
-
-    function planTargetToWorld(plan) {
-      const target = plan.target || {};
-      const x = Number(target.x ?? 0);
-      const y = Number(target.y ?? 0);
-      const z = Number(target.z ?? 0.2);
-      if (Math.abs(x) < 0.03 && Math.abs(y) < 0.03) {
-        return { x: plan.arm === "left_arm" ? -0.18 : 0.18, y: 0.0, z: 0.76 };
-      }
-      return {
-        x: Math.max(-2.85, Math.min(2.85, (x - 0.35) * 6.0)),
-        y: Math.max(-1.3, Math.min(1.35, (y - 0.42) * 5.0)),
-        z: Math.max(0.22, Math.min(1.5, z * 6.0)),
-      };
-    }
-
-    function clearCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
-      const gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
-      gradient.addColorStop(0, "#111b25");
-      gradient.addColorStop(1, "#0c1118");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, rect.width, rect.height);
-    }
-
-    function line3(a, b, color, width = 1.5, dash = []) {
-      const pa = project(a);
-      const pb = project(b);
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      ctx.setLineDash(dash);
-      ctx.beginPath();
-      ctx.moveTo(pa.x, pa.y);
-      ctx.lineTo(pb.x, pb.y);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function fillEllipse3(center, rx, ry, color, stroke = "rgba(255,255,255,0.18)") {
-      const p = project(center);
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.ellipse(p.x, p.y, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawLabel(text, point, color = colors.muted) {
-      const p = project(point);
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.font = "12px Inter, Segoe UI, sans-serif";
-      ctx.fillText(text, p.x + 8, p.y - 8);
-      ctx.restore();
-    }
-
-    function drawBox(center, size, color, stroke = "rgba(255,255,255,0.22)") {
-      const p = project({ x: center.x, y: center.y, z: center.z + size.z });
-      const base = project(center);
-      const w = size.x * 72;
-      const d = size.y * 32;
-      const h = Math.max(8, (base.y - p.y));
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.roundRect(p.x - w / 2, p.y - h / 2, w, Math.max(10, h), 4);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "rgba(255,255,255,0.08)";
-      ctx.fillRect(p.x - w / 2, p.y - h / 2, w, 5);
-      if (d > 0) {
-        ctx.strokeStyle = "rgba(0,0,0,0.28)";
-        ctx.strokeRect(p.x - w / 2 + 4, p.y - h / 2 + 4, w, Math.max(10, h));
-      }
-      ctx.restore();
-    }
-
-    function drawGrid() {
-      for (let i = -4; i <= 4; i += 0.5) {
-        const major = Math.abs(i % 1) < 0.01;
-        line3({ x: -4, y: i, z: 0 }, { x: 4, y: i, z: 0 }, major ? "rgba(128,159,184,0.26)" : "rgba(128,159,184,0.12)", major ? 1.3 : 0.8);
-        line3({ x: i, y: -2.4, z: 0 }, { x: i, y: 2.3, z: 0 }, major ? "rgba(128,159,184,0.26)" : "rgba(128,159,184,0.12)", major ? 1.3 : 0.8);
-      }
-      line3({ x: 0, y: 0, z: 0 }, { x: 1.2, y: 0, z: 0 }, "#ff6b6b", 3);
-      line3({ x: 0, y: 0, z: 0 }, { x: 0, y: 1.2, z: 0 }, "#57d68d", 3);
-      line3({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1.2 }, "#62b6ff", 3);
-      drawLabel("X", { x: 1.25, y: 0, z: 0 }, "#ff8f8f");
-      drawLabel("Y", { x: 0, y: 1.25, z: 0 }, "#8ff0b5");
-      drawLabel("Z", { x: 0, y: 0, z: 1.25 }, "#9ed0ff");
-    }
-
-    function drawCamera(state) {
-      drawBox(world.camera, { x: 0.6, y: 0.32, z: 0.18 }, "rgba(36,56,74,0.95)", colors.left);
-      const targetA = { x: -0.95, y: -0.35, z: 0 };
-      const targetB = { x: 0.95, y: -0.35, z: 0 };
-      const targetC = { x: 0.95, y: 0.95, z: 0 };
-      const targetD = { x: -0.95, y: 0.95, z: 0 };
-      const pulse = state.cameraPulse ? "rgba(98,182,255,0.36)" : "rgba(98,182,255,0.16)";
-      [targetA, targetB, targetC, targetD].forEach((target) => line3(world.camera, target, pulse, 1.2, [5, 5]));
-      line3(targetA, targetB, pulse, 1);
-      line3(targetB, targetC, pulse, 1);
-      line3(targetC, targetD, pulse, 1);
-      line3(targetD, targetA, pulse, 1);
-      drawLabel("RGB-D camera", { x: world.camera.x + 0.25, y: world.camera.y, z: world.camera.z + 0.2 }, colors.left);
-    }
-
-    function drawWorkcell(state) {
-      drawBox({ x: world.tray.x, y: world.tray.y, z: 0.02 }, { x: 1.45, y: 1.25, z: 0.10 }, "rgba(23,35,48,0.92)", "#334557");
-      drawLabel("loose parts", { x: world.tray.x - 0.58, y: world.tray.y - 0.56, z: 0.18 });
-      drawBox({ x: world.reject.x, y: world.reject.y, z: 0.02 }, { x: 1.45, y: 1.25, z: 0.10 }, "rgba(23,35,48,0.92)", "#334557");
-      drawLabel("installed / reject", { x: world.reject.x - 0.58, y: world.reject.y - 0.56, z: 0.18 });
-      drawBox({ x: 0, y: 0, z: 0.05 }, { x: 1.55, y: 1.0, z: 0.24 }, "rgba(27,38,50,0.96)", state.fixtureColor);
-      drawLabel("assembly fixture", { x: -0.52, y: -0.48, z: 0.4 }, state.fixtureColor);
-
-      if (!state.hiddenLoose.has("base")) drawBox({ x: -2.7, y: -1.0, z: 0.18 }, { x: 0.85, y: 0.28, z: 0.12 }, colors.base);
-      if (!state.hiddenLoose.has("rollerA")) fillEllipse3({ x: -2.85, y: -0.45, z: 0.26 }, 16, 10, colors.roller);
-      if (!state.hiddenLoose.has("rollerB")) fillEllipse3({ x: -2.35, y: -0.42, z: 0.26 }, 16, 10, colors.roller);
-      if (!state.hiddenLoose.has("belt")) drawBelt({ x: -2.58, y: 0.18, z: 0.22 }, 0.75, 0.26, colors.belt);
-      if (!state.hiddenLoose.has("motor")) drawBox({ x: -2.92, y: 0.75, z: 0.22 }, { x: 0.32, y: 0.32, z: 0.26 }, colors.motor);
-      if (!state.hiddenLoose.has("sensor")) drawBox({ x: -2.16, y: 0.76, z: 0.18 }, { x: 0.34, y: 0.22, z: 0.14 }, colors.sensor);
-
-      if (state.installed.has("base")) drawBox({ x: 0, y: 0, z: 0.28 }, { x: 1.18, y: 0.36, z: 0.12 }, colors.base);
-      if (state.installed.has("rollerA")) fillEllipse3({ x: -0.42, y: 0, z: 0.48 }, 18, 10, colors.roller);
-      if (state.installed.has("rollerB")) fillEllipse3({ x: 0.42, y: 0, z: 0.48 }, 18, 10, colors.roller);
-      if (state.installed.has("belt")) drawBelt({ x: 0, y: 0, z: 0.52 }, 1.0, 0.26, state.beltColor);
-      if (state.installed.has("motor")) drawBox({ x: 0.78, y: 0.02, z: 0.45 }, { x: 0.28, y: 0.3, z: 0.24 }, colors.motor);
-      if (state.installed.has("sensor")) drawBox({ x: -0.72, y: 0.32, z: 0.42 }, { x: 0.32, y: 0.18, z: 0.14 }, colors.sensor);
-      if (state.puckProgress > 0) {
-        fillEllipse3({ x: -0.42 + state.puckProgress * 0.86, y: 0.04, z: 0.68 }, 9, 6, "#ffffff", "rgba(255,255,255,0.55)");
-      }
-    }
-
-    function drawBelt(center, width, depth, color) {
-      const a = project({ x: center.x - width / 2, y: center.y - depth / 2, z: center.z });
-      const b = project({ x: center.x + width / 2, y: center.y - depth / 2, z: center.z });
-      const c = project({ x: center.x + width / 2, y: center.y + depth / 2, z: center.z });
-      const d = project({ x: center.x - width / 2, y: center.y + depth / 2, z: center.z });
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 7;
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.lineTo(c.x, c.y);
-      ctx.lineTo(d.x, d.y);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawRobotArm(base, tool, color, label) {
-      const shoulder = { x: base.x, y: base.y, z: 0.62 };
-      const elbow = {
-        x: base.x * 0.58 + tool.x * 0.42,
-        y: base.y * 0.58 + tool.y * 0.42,
-        z: Math.max(0.95, tool.z + 0.35),
-      };
-      drawBox({ x: base.x, y: base.y, z: 0.08 }, { x: 0.42, y: 0.42, z: 0.18 }, "rgba(27,38,50,0.98)", color);
-      line3(shoulder, elbow, color, 8);
-      line3(elbow, tool, color, 8);
-      fillEllipse3(shoulder, 12, 8, color);
-      fillEllipse3(elbow, 10, 7, color);
-      fillEllipse3(tool, 9, 6, color);
-      drawLabel(label, { x: base.x - 0.2, y: base.y + 0.18, z: 0.32 }, color);
-    }
-
-    function drawPlannedPath(state) {
-      if (!state.plannedPath) return;
-      const path = state.plannedPath;
-      const color = path.status === "warn" ? colors.warning : colors.left;
-      line3(path.start, path.target, color, 2.5, [8, 6]);
-      fillEllipse3(path.target, 12, 8, color, "rgba(255,255,255,0.35)");
-      drawLabel(`${path.arm.replace("_arm", "")} target / ${path.clearance}mm clearance`, { x: path.target.x + 0.1, y: path.target.y, z: path.target.z + 0.2 }, color);
-    }
-
-    function drawActivePose(state) {
-      if (!state.activePose) return;
-      const p = state.activePose;
-      line3({ x: p.x - 0.18, y: p.y, z: p.z }, { x: p.x + 0.18, y: p.y, z: p.z }, colors.yellow, 2);
-      line3({ x: p.x, y: p.y - 0.18, z: p.z }, { x: p.x, y: p.y + 0.18, z: p.z }, colors.yellow, 2);
-      line3({ x: p.x, y: p.y, z: p.z - 0.12 }, { x: p.x, y: p.y, z: p.z + 0.18 }, colors.yellow, 2);
-      drawLabel("pose estimate", { x: p.x + 0.08, y: p.y + 0.08, z: p.z + 0.16 }, colors.yellow);
-    }
-
-    function drawScene(state = sceneState()) {
-      clearCanvas();
-      drawGrid();
-      drawCamera(state);
-      drawWorkcell(state);
-      drawPlannedPath(state);
-      drawActivePose(state);
-      drawRobotArm(world.leftBase, state.leftTool, colors.left, "left arm");
-      drawRobotArm(world.rightBase, state.rightTool, colors.right, "right arm");
-      drawViewportText(state);
-    }
-
-    function animateScene(from, to) {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
+    function animateTo(from, to) {
       const durationMs = Math.min(380, Math.max(180, playbackMs * 0.72));
-      const started = performance.now();
-      const frame = (now) => {
-        const t = Math.min(1, (now - started) / durationMs);
-        drawScene(lerpScene(from, to, t));
-        if (t < 1) {
-          animationFrame = requestAnimationFrame(frame);
-        } else {
-          animationFrame = null;
-          drawScene(to);
-        }
-      };
-      animationFrame = requestAnimationFrame(frame);
+      tween = { from, to, start: performance.now(), durationMs };
     }
 
-    function drawViewportText(state) {
-      const rect = canvas.getBoundingClientRect();
-      const event = currentEvent();
-      ctx.save();
-      ctx.fillStyle = "rgba(12, 16, 22, 0.70)";
-      ctx.strokeStyle = "rgba(128, 159, 184, 0.24)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(18, rect.height - 96, Math.min(720, rect.width - 36), 72, 8);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = statusToColor(event.status);
-      ctx.font = "700 14px Inter, Segoe UI, sans-serif";
-      ctx.fillText(`${event.phase} [${event.status}]`, 34, rect.height - 64);
-      ctx.fillStyle = colors.text;
-      ctx.font = "13px Inter, Segoe UI, sans-serif";
-      wrapText(event.message, 34, rect.height - 40, Math.min(680, rect.width - 76), 17);
-      ctx.restore();
+    function currentEvent() {
+      return events[Math.max(0, Math.min(index, events.length - 1))];
     }
 
-    function wrapText(text, x, y, maxWidth, lineHeight) {
-      const words = text.split(" ");
-      let line = "";
-      for (const word of words) {
-        const test = line ? `${line} ${word}` : word;
-        if (ctx.measureText(test).width > maxWidth && line) {
-          ctx.fillText(line, x, y);
-          line = word;
-          y += lineHeight;
-        } else {
-          line = test;
-        }
+    function renderLoop(now) {
+      if (tween) {
+        const t = Math.min(1, (now - tween.start) / tween.durationMs);
+        applySceneState(lerpState(tween.from, tween.to, t));
+        if (t >= 1) tween = null;
       }
-      ctx.fillText(line, x, y);
-    }
-
-    function statusToColor(status) {
-      if (status === "fail") return colors.fault;
-      if (status === "warn") return colors.warning;
-      if (status === "recovered") return colors.left;
-      return colors.accepted;
+      renderer.render(scene, camera);
+      requestAnimationFrame(renderLoop);
     }
 
     function renderAt(nextIndex) {
@@ -976,21 +1521,48 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       setText("currentFocus", isCritical(current) ? "critical event" : "normal sequence");
       el("scrubber").value = String(index);
       setText("stepLabel", `${index + 1} / ${events.length}`);
+      renderTopStatus(current, target);
+      renderEventInspector(current, target);
+      renderTimelineMini();
       if (Math.abs(index - oldIndex) === 1) {
-        animateScene(from, target);
+        animateTo(from, target);
       } else {
-        if (animationFrame) {
-          cancelAnimationFrame(animationFrame);
-          animationFrame = null;
-        }
-        drawScene(target);
+        tween = null;
+        applySceneState(target);
       }
       document.querySelectorAll(".event").forEach((node) => node.classList.remove("active"));
       const active = document.querySelector(`[data-event-index="${index}"]`);
       if (active) {
         active.classList.add("active");
-        active.scrollIntoView({ block: "nearest" });
+        keepEventVisible(active);
       }
+    }
+
+    function keepEventVisible(active) {
+      const list = el("eventList");
+      const top = active.offsetTop;
+      const bottom = top + active.offsetHeight;
+      if (top < list.scrollTop) list.scrollTop = top;
+      if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
+    }
+
+    function setText(id, value) {
+      el(id).textContent = value;
+    }
+
+    function isCritical(event) {
+      return event.status !== "pass" || criticalPhases.has(event.phase);
+    }
+
+    function isPlanning(event) {
+      return event.phase === "motion_planning" || event.phase === "grasp_planning";
+    }
+
+    function filteredEvents() {
+      if (eventFilter === "critical") return events.map((event, i) => [event, i]).filter(([event]) => isCritical(event));
+      if (eventFilter === "recovery") return events.map((event, i) => [event, i]).filter(([event]) => event.status === "recovered" || event.phase === "recovery");
+      if (eventFilter === "planning") return events.map((event, i) => [event, i]).filter(([event]) => isPlanning(event));
+      return events.map((event, i) => [event, i]);
     }
 
     function play() {
@@ -1030,6 +1602,231 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       }
     }
 
+    function setView(mode) {
+      if (mode === "top") {
+        camera.position.set(0, 7.8, 0.01);
+        camera.up.set(0, 0, -1);
+      } else if (mode === "side") {
+        camera.position.set(6.5, 2.2, 0);
+        camera.up.set(0, 1, 0);
+      } else if (mode === "front") {
+        camera.position.set(0, 2.4, 6.5);
+        camera.up.set(0, 1, 0);
+      } else {
+        updateOrbitCamera();
+        return;
+      }
+      camera.lookAt(cameraTarget);
+    }
+
+    function updateOrbitCamera() {
+      const x = cameraTarget.x + orbit.radius * Math.cos(orbit.pitch) * Math.sin(orbit.yaw);
+      const y = cameraTarget.y + orbit.radius * Math.sin(orbit.pitch);
+      const z = cameraTarget.z + orbit.radius * Math.cos(orbit.pitch) * Math.cos(orbit.yaw);
+      camera.position.set(x, y, z);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(cameraTarget);
+    }
+
+    function resizeRenderer() {
+      const rect = viewport.getBoundingClientRect();
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / Math.max(1, rect.height);
+      camera.updateProjectionMatrix();
+      if (document.querySelector("[data-view].active")?.dataset.view === "iso") updateOrbitCamera();
+    }
+
+    function initInteraction() {
+      viewport.addEventListener("pointerdown", (event) => {
+        dragging = true;
+        lastPointer = { x: event.clientX, y: event.clientY };
+        viewport.setPointerCapture(event.pointerId);
+      });
+      viewport.addEventListener("pointermove", (event) => {
+        if (!dragging) return;
+        const activeView = document.querySelector("[data-view].active")?.dataset.view;
+        if (activeView !== "iso") return;
+        const dx = event.clientX - lastPointer.x;
+        const dy = event.clientY - lastPointer.y;
+        lastPointer = { x: event.clientX, y: event.clientY };
+        orbit.yaw -= dx * 0.006;
+        orbit.pitch = Math.max(0.18, Math.min(1.25, orbit.pitch + dy * 0.004));
+        updateOrbitCamera();
+      });
+      viewport.addEventListener("pointerup", () => dragging = false);
+      viewport.addEventListener("wheel", (event) => {
+        const activeView = document.querySelector("[data-view].active")?.dataset.view;
+        if (activeView !== "iso") return;
+        event.preventDefault();
+        orbit.radius = Math.max(3.2, Math.min(10, orbit.radius + event.deltaY * 0.006));
+        updateOrbitCamera();
+      }, { passive: false });
+    }
+
+    function renderMetrics() {
+      const metrics = payload.metrics;
+      const items = [
+        ["Final status", metrics.final_status],
+        ["Recovery events", metrics.recovered_events],
+        ["Active vision events", metrics.active_vision_events],
+        ["Bimanual assists", metrics.bimanual_events],
+        ["Motion plans", metrics.motion_plan_count],
+        ["Min clearance", `${metrics.minimum_clearance_mm} mm`],
+        ["Avg plan time", `${metrics.average_planning_time_ms} ms`],
+        ["Sim elapsed", `${metrics.simulated_elapsed_s}s`],
+      ];
+      el("metrics").innerHTML = items.map(([label, value]) => `
+        <div class="metric">
+          <div class="metric-label">${label}</div>
+          <div class="metric-value">${value}</div>
+        </div>
+      `).join("");
+      const pill = el("final-pill");
+      pill.textContent = metrics.final_status;
+      pill.classList.add(metrics.final_status === "PASS" ? "pass" : "fail");
+    }
+
+    function renderSceneTree(state) {
+      const rows = [
+        ["left arm", "#62b6ff", "active"],
+        ["right arm", "#b99cff", "active"],
+        ["RGB-D camera", "#62b6ff", state.cameraPulse ? "observing" : "ready"],
+        ["fixture", state.fixtureMode === "fault" ? "#ff6b6b" : state.fixtureMode === "accepted" ? "#57d68d" : "#9fb3c6", state.fixtureMode],
+        ["base", "#6ee7e7", state.installed.has("base") ? "installed" : "pending"],
+        ["rollers", "#f2c14e", `${Number(state.installed.has("rollerA")) + Number(state.installed.has("rollerB"))}/2`],
+        ["belt", state.beltFault ? "#ff6b6b" : "#57d68d", state.installed.has("belt") ? "seated" : "pending"],
+        ["motor", "#b99cff", state.installed.has("motor") ? "installed" : "pending"],
+        ["sensor", "#62b6ff", state.installed.has("sensor") ? "installed" : "pending"],
+      ];
+      el("sceneTree").innerHTML = rows.map(([label, color, status]) => `
+        <div class="tree-row">
+          <span class="tree-dot" style="color:${color}; background:${color};"></span>
+          <span>${label}</span>
+          <span class="tree-status">${status}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderPlanningStack(state) {
+      const confidence = state.lastDetection ? state.lastDetection.confidence * 100 : 0;
+      const graspScore = state.lastGrasp ? state.lastGrasp.score * 100 : 0;
+      const planTime = state.lastPlan ? state.lastPlan.planning_time_ms : 0;
+      const clearance = state.lastPlan ? state.lastPlan.min_clearance_mm : 0;
+      const rows = [
+        ["Vision", confidence ? `${confidence.toFixed(1)}%` : "--", confidence],
+        ["Grasp", graspScore ? `${graspScore.toFixed(1)}%` : "--", graspScore],
+        ["Planner", planTime ? `${planTime}ms` : "--", Math.max(0, 100 - Math.min(100, planTime / 5))],
+        ["Clearance", clearance ? `${clearance.toFixed(1)}mm` : "--", Math.min(100, clearance * 3.2)],
+        ["Bimanual", state.lastAssist ? state.lastAssist.replace("_", " ") : "standby", state.lastAssist ? 100 : 18],
+      ];
+      el("planningStack").innerHTML = rows.map(([label, value, pct]) => `
+        <div class="stack-row">
+          <span>${label}</span>
+          <span class="stack-bar"><span class="stack-fill" style="width:${Math.max(4, Math.min(100, pct))}%"></span></span>
+          <span>${value}</span>
+        </div>
+      `).join("");
+    }
+
+    function updateToolReadouts(state) {
+      setText("leftTcpReadout", formatPoint(state.leftTool));
+      setText("rightTcpReadout", formatPoint(state.rightTool));
+      setText("targetReadout", state.plannedPath ? formatPoint(state.plannedPath.target) : "none");
+    }
+
+    function renderTopStatus(event, state) {
+      const plan = state.lastPlan;
+      const detection = state.lastDetection;
+      setText("scenarioName", payload.state.job_id.replace("JOB-", "").toLowerCase());
+      setText("clearanceReadout", plan ? `${plan.min_clearance_mm.toFixed(1)} mm` : "-- mm");
+      setText("confidenceReadout", detection ? `${(detection.confidence * 100).toFixed(1)}%` : "--");
+      setText("robotMode", event.status === "fail" ? "fault hold" : event.status === "recovered" ? "recovering" : event.phase.replace("_", " "));
+      setText("plannerHealth", plan ? `${plan.status} / ${plan.planning_time_ms}ms` : "deterministic");
+      setText("cameraState", state.cameraPulse ? "tracking" : "ready");
+      setText("visionMode", detection ? `${detection.kind} / ${detection.view_id}` : "waiting for detection");
+      setText("visionConfidence", detection ? `${(detection.confidence * 100).toFixed(1)}%` : "--");
+    }
+
+    function renderEventInspector(event, state) {
+      const details = event.details || {};
+      const plan = details.plan || state.lastPlan;
+      const detection = details.detection || state.lastDetection;
+      const grasp = details.grasp || state.lastGrasp;
+      const rows = [
+        ["sequence", `#${event.sequence}`],
+        ["phase", event.phase],
+        ["status", event.status],
+        ["message", event.message],
+        ["arm", plan?.arm || grasp?.arm || details.assist_arm || "--"],
+        ["target", plan ? formatPose(plan.target) : state.plannedPath ? formatPoint(state.plannedPath.target) : "--"],
+        ["clearance", plan ? `${plan.min_clearance_mm.toFixed(2)} mm` : grasp ? `${grasp.clearance_mm.toFixed(2)} mm` : "--"],
+        ["planning", plan ? `${plan.planning_time_ms} ms / ${plan.path_length_mm.toFixed(1)} mm` : "--"],
+        ["detection", detection ? `${detection.kind} ${Math.round(detection.confidence * 100)}%` : "--"],
+        ["fixture", state.fixtureMode],
+      ];
+      el("eventInspector").innerHTML = rows.map(([key, value]) => `
+        <div class="inspector-row">
+          <span class="inspector-key">${safeHtml(key)}</span>
+          <span class="inspector-value">${safeHtml(value)}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderTimelineMini() {
+      const max = Math.max(1, events.length - 1);
+      const markers = events.map((event, i) => {
+        if (!isCritical(event)) return "";
+        const left = (i / max) * 100;
+        const cls = event.status === "fail" ? "timeline-marker fail" : "timeline-marker";
+        return `<span class="${cls}" style="left:${left}%"></span>`;
+      }).join("");
+      const cursor = `<span class="timeline-cursor" style="left:${(index / max) * 100}%"></span>`;
+      el("timelineMini").innerHTML = markers + cursor;
+    }
+
+    function formatPoint(point) {
+      return `${point.x.toFixed(2)}, ${point.y.toFixed(2)}, ${point.z.toFixed(2)}`;
+    }
+
+    function formatPose(pose) {
+      return `${Number(pose.x).toFixed(2)}, ${Number(pose.y).toFixed(2)}, ${Number(pose.z).toFixed(2)}`;
+    }
+
+    function safeHtml(value) {
+      return String(value ?? "--")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderEvents() {
+      const rows = filteredEvents();
+      el("eventList").innerHTML = rows.map(([event, i]) => `
+        <div class="event" data-event-index="${i}">
+          <div class="event-top">
+            <span>#${event.sequence} ${event.phase}</span>
+            <span class="${statusClass(event.status)}">${event.status}</span>
+          </div>
+          <div class="event-msg">${event.message}</div>
+        </div>
+      `).join("") || `<div class="event"><div class="event-msg">No events match this filter.</div></div>`;
+      document.querySelectorAll(".event").forEach((node) => {
+        if (!node.dataset.eventIndex) return;
+        node.addEventListener("click", () => renderAt(Number(node.dataset.eventIndex)));
+      });
+      const critical = events.filter((event) => isCritical(event));
+      el("criticalRows").innerHTML = critical.map((event) => `
+        <tr>
+          <td>${event.sequence}</td>
+          <td>${event.phase}</td>
+          <td class="${statusClass(event.status)}">${event.status}</td>
+          <td>${event.message}</td>
+        </tr>
+      `).join("");
+    }
+
     function runSummaryText() {
       const m = payload.metrics;
       return [
@@ -1064,55 +1861,6 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       }, 1400);
     }
 
-    function renderMetrics() {
-      const metrics = payload.metrics;
-      const items = [
-        ["Final status", metrics.final_status],
-        ["Recovery events", metrics.recovered_events],
-        ["Active vision events", metrics.active_vision_events],
-        ["Bimanual assists", metrics.bimanual_events],
-        ["Motion plans", metrics.motion_plan_count],
-        ["Min clearance", `${metrics.minimum_clearance_mm} mm`],
-        ["Avg plan time", `${metrics.average_planning_time_ms} ms`],
-        ["Sim elapsed", `${metrics.simulated_elapsed_s}s`],
-      ];
-      el("metrics").innerHTML = items.map(([label, value]) => `
-        <div class="metric">
-          <div class="metric-label">${label}</div>
-          <div class="metric-value">${value}</div>
-        </div>
-      `).join("");
-      const pill = el("final-pill");
-      pill.textContent = metrics.final_status;
-      pill.classList.add(metrics.final_status === "PASS" ? "pass" : "fail");
-    }
-
-    function renderEvents() {
-      const rows = filteredEvents();
-      el("eventList").innerHTML = rows.map(([event, i]) => `
-        <div class="event" data-event-index="${i}">
-          <div class="event-top">
-            <span>#${event.sequence} ${event.phase}</span>
-            <span class="${statusClass(event.status)}">${event.status}</span>
-          </div>
-          <div class="event-msg">${event.message}</div>
-        </div>
-      `).join("") || `<div class="event"><div class="event-msg">No events match this filter.</div></div>`;
-      document.querySelectorAll(".event").forEach((node) => {
-        if (!node.dataset.eventIndex) return;
-        node.addEventListener("click", () => renderAt(Number(node.dataset.eventIndex)));
-      });
-      const critical = events.filter((event) => isCritical(event));
-      el("criticalRows").innerHTML = critical.map((event) => `
-        <tr>
-          <td>${event.sequence}</td>
-          <td>${event.phase}</td>
-          <td class="${statusClass(event.status)}">${event.status}</td>
-          <td>${event.message}</td>
-        </tr>
-      `).join("");
-    }
-
     el("playBtn").addEventListener("click", play);
     el("resetBtn").addEventListener("click", () => {
       playing = false;
@@ -1131,10 +1879,18 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       el("recordingModeBtn").textContent = document.body.classList.contains("recording-mode")
         ? "Exit Recording"
         : "Recording";
-      requestAnimationFrame(resizeCanvas);
+      requestAnimationFrame(resizeRenderer);
     });
     el("copySummaryBtn").addEventListener("click", copyRunSummary);
-    el("fitViewBtn").addEventListener("click", resizeCanvas);
+    el("fitViewBtn").addEventListener("click", () => {
+      orbit = { yaw: -0.78, pitch: 0.58, radius: 6.2 };
+      updateOrbitCamera();
+    });
+    el("ghostBtn").addEventListener("click", () => {
+      showGhosts = !showGhosts;
+      el("ghostBtn").classList.toggle("active", showGhosts);
+      setGhostVisibility(showGhosts);
+    });
     document.querySelectorAll("[data-filter]").forEach((button) => {
       button.addEventListener("click", () => {
         eventFilter = button.dataset.filter;
@@ -1146,20 +1902,21 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     });
     document.querySelectorAll("[data-view]").forEach((button) => {
       button.addEventListener("click", () => {
-        viewMode = button.dataset.view;
         document.querySelectorAll("[data-view]").forEach((node) => node.classList.remove("active"));
         button.classList.add("active");
-        drawScene();
+        setView(button.dataset.view);
       });
     });
     el("scrubber").max = String(Math.max(0, events.length - 1));
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeRenderer);
 
     renderMetrics();
     renderEvents();
-    resizeCanvas();
+    resizeRenderer();
+    setView("iso");
     renderAt(0);
+    requestAnimationFrame(renderLoop);
   </script>
 </body>
 </html>
@@ -1168,3 +1925,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         template.replace("__PAYLOAD__", serialized).replace("__RAW_PAYLOAD__", escaped),
         encoding="utf-8",
     )
+
+
+def _copy_three_vendor(output_dir: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[3]
+    source_dir = repo_root / "assets" / "vendor" / "three"
+    target_dir = output_dir / "assets" / "vendor" / "three"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    for filename in ("three.module.min.js", "three.core.min.js", "LICENSE"):
+        shutil.copyfile(source_dir / filename, target_dir / filename)

@@ -34,10 +34,10 @@ The repository currently includes a deterministic simulation core:
 - Bimanual coordination events for fixture stabilization and installation.
 - Recovery-aware assembly controller.
 - Failure injection for belt slip, clamp failure, and low-confidence vision.
-- Markdown acceptance report and single-file HTML dashboard output.
+- Markdown acceptance report and static HTML dashboard output.
 - LinkedIn demo package generation.
-- RoboDK/RViz-style canvas viewport with grid floor, axes, robot links, tool motion,
-  planned paths, camera frustum, and event-driven assembly state.
+- RoboDK/RViz-style Three.js/WebGL viewport with grid floor, axes, robot links,
+  tool motion, planned paths, camera frustum, and event-driven assembly state.
 
 Run it:
 
@@ -52,7 +52,8 @@ PYTHONPATH=src python3 -m microfactory demo
 ```
 
 The generated `index.html` is an interactive scenario workbench with embedded replay
-dashboards, comparison metrics, reports, and a recording mode.
+dashboards, comparison metrics, reports, and a recording mode. Serve it with a local
+HTTP server so the browser can load the vendored Three.js module.
 
 Run tests:
 
