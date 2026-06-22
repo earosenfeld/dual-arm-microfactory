@@ -5,6 +5,7 @@ from pathlib import Path
 
 from microfactory.cell.models import StepStatus
 from microfactory.control.assembly import AssemblyResult
+from microfactory.reporting.metrics import summarize_run
 
 
 def write_run_artifacts(result: AssemblyResult, output_dir: Path) -> None:
@@ -17,6 +18,10 @@ def write_run_artifacts(result: AssemblyResult, output_dir: Path) -> None:
         json.dumps(result.state.as_dict(), indent=2),
         encoding="utf-8",
     )
+    (output_dir / "metrics.json").write_text(
+        json.dumps(summarize_run(result).as_dict(), indent=2),
+        encoding="utf-8",
+    )
     (output_dir / "acceptance_report.md").write_text(
         render_markdown_report(result),
         encoding="utf-8",
@@ -24,6 +29,7 @@ def write_run_artifacts(result: AssemblyResult, output_dir: Path) -> None:
 
 
 def render_markdown_report(result: AssemblyResult) -> str:
+    metrics = summarize_run(result)
     pass_count = result.log.count(StepStatus.PASS)
     warn_count = result.log.count(StepStatus.WARN)
     recovered_count = result.log.count(StepStatus.RECOVERED)
@@ -40,6 +46,11 @@ def render_markdown_report(result: AssemblyResult) -> str:
         f"- Warning events: {warn_count}",
         f"- Recovery events: {recovered_count}",
         f"- Failure events: {fail_count}",
+        f"- Active vision events: {metrics.active_vision_events}",
+        f"- Bimanual coordination events: {metrics.bimanual_events}",
+        f"- Motion plans: {metrics.motion_plan_count}",
+        f"- Minimum clearance: {metrics.minimum_clearance_mm:.1f} mm",
+        f"- Average planning time: {metrics.average_planning_time_ms:.1f} ms",
         f"- Cycle time: {result.state.cycle_time_s:.1f}s",
         "",
         "## Fixture Result",
@@ -54,6 +65,9 @@ def render_markdown_report(result: AssemblyResult) -> str:
         "",
     ]
     for event in result.log.events:
-        lines.append(f"- `{event.timestamp}` **{event.phase}** [{event.status.value}] {event.message}")
+        lines.append(
+            f"- `{event.sim_time_s:05.1f}s` **{event.phase}** "
+            f"[{event.status.value}] {event.message}"
+        )
     lines.append("")
     return "\n".join(lines)

@@ -35,17 +35,24 @@ The repository currently includes a deterministic simulation core:
 - Recovery-aware assembly controller.
 - Failure injection for belt slip, clamp failure, and low-confidence vision.
 - Markdown acceptance report and single-file HTML dashboard output.
+- LinkedIn demo package generation.
 
 Run it:
 
 ```bash
-PYTHONPATH=src python -m microfactory run --scenario belt_slip
+PYTHONPATH=src python3 -m microfactory run --scenario belt_slip
+```
+
+Generate the LinkedIn-ready demo package:
+
+```bash
+PYTHONPATH=src python3 -m microfactory demo
 ```
 
 Run tests:
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
 ## Near-Term Roadmap
@@ -57,6 +64,11 @@ PYTHONPATH=src python -m unittest discover -s tests
 - Add real calibration workflow using AprilTags.
 - Add physical fixture with sensors and a simulated PLC handshake.
 - Add learned local insertion policy as an optional subskill.
+
+## Demo Recording
+
+See [docs/linkedin-recording-guide.md](docs/linkedin-recording-guide.md) for the
+recommended screen-recording flow and caption framing.
 
 ## Non-Goals
 

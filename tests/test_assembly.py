@@ -4,7 +4,7 @@ import unittest
 
 from microfactory.cell.scenarios import build_conveyor_cell
 from microfactory.control.assembly import ConveyorAssemblyController
-from microfactory.cell.models import StepStatus
+from microfactory.cell.models import PartState, StepStatus
 
 
 class ConveyorAssemblyControllerTests(unittest.TestCase):
@@ -28,6 +28,14 @@ class ConveyorAssemblyControllerTests(unittest.TestCase):
 
         self.assertTrue(result.success)
         self.assertIn("active_vision", phases)
+
+    def test_wrong_part_is_rejected_and_spare_part_is_used(self) -> None:
+        result = ConveyorAssemblyController().run(build_conveyor_cell("wrong_part"))
+
+        self.assertTrue(result.success)
+        self.assertEqual(result.state.parts["sensor-001"].state, PartState.REJECTED)
+        self.assertEqual(result.state.parts["sensor-002"].state, PartState.INSTALLED)
+        self.assertGreaterEqual(result.log.count(StepStatus.RECOVERED), 1)
 
 
 if __name__ == "__main__":

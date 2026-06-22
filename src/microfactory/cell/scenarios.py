@@ -31,6 +31,12 @@ def build_conveyor_cell(scenario: str = "nominal") -> CellState:
     if scenario == "wrong_part":
         parts["sensor-001"].metadata["part_number"] = "SENSOR-REV-B"
         parts["sensor-001"].metadata["expected_part_number"] = "SENSOR-REV-C"
+        parts["sensor-002"] = Part(
+            "sensor-002",
+            PartKind.SENSOR,
+            Pose(0.56, 0.55, 0.03, yaw=-0.08),
+            metadata={"part_number": "SENSOR-REV-C", "expected_part_number": "SENSOR-REV-C"},
+        )
 
     fixture = Fixture(id="fixture-conveyor-a", pose=Pose(0.0, 0.0, 0.0))
     failures = set()

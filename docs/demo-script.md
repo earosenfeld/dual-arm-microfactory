@@ -39,3 +39,9 @@ The best video moment is not the first successful assembly. It is the recovery:
 - Recovery is state-machine driven, not a prompt.
 - The event log is the acceptance artifact and debugging trace.
 - Learning models are optional subskills, supervised by deterministic safety logic.
+
+## LinkedIn Caption Hook
+
+> I am building a dual-arm autonomous microfactory demo. The goal is not another
+> happy-path pick-and-place; it is a robotic cell that can detect failure, recover,
+> run a functional test, and produce acceptance evidence.
