@@ -16,8 +16,9 @@ Open the generated `index.html`, then open the `belt_slip` dashboard first.
 4. Pause when the belt slip failure appears.
 5. Use `Next Critical` to jump through the failure, recovery, and final functional test.
 6. Show the metrics cards and live state chips.
-7. Toggle the `Critical` filter in the timeline.
-8. End on the final `PASS` status.
+7. Switch the viewport from `Iso` to `Top` briefly to show the robotics-workbench feel.
+8. Toggle the `Critical` filter in the timeline.
+9. End on the final `PASS` status.
 
 ## Narration
 

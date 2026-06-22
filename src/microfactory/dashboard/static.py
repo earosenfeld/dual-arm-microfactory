@@ -26,8 +26,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0d1117;
-      --band: #111922;
+      --bg: #0c1016;
+      --band: #101821;
       --panel: #151d27;
       --panel-2: #1b2632;
       --line: #2a3948;
@@ -48,7 +48,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       color: var(--text);
     }
     main {
-      width: min(1440px, calc(100vw - 40px));
+      width: min(1480px, calc(100vw - 40px));
       margin: 0 auto;
       padding: 28px 0 40px;
     }
@@ -67,11 +67,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       line-height: 1;
     }
     h2 { font-size: 18px; margin-bottom: 12px; }
-    h3 { font-size: 14px; margin-bottom: 8px; color: var(--muted); font-weight: 600; }
     .subhead {
       color: var(--muted);
       font-size: 16px;
-      max-width: 860px;
+      max-width: 900px;
       line-height: 1.45;
     }
     .pill {
@@ -90,7 +89,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .pill.fail { color: var(--red); border-color: rgba(255, 107, 107, 0.45); }
     .layout {
       display: grid;
-      grid-template-columns: minmax(640px, 1.4fr) minmax(360px, 0.8fr);
+      grid-template-columns: minmax(720px, 1.5fr) minmax(360px, 0.75fr);
       gap: 16px;
       align-items: start;
     }
@@ -101,19 +100,63 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       overflow: hidden;
     }
     .panel-body { padding: 16px; }
-    .stage {
-      background:
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-        #0f151c;
-      background-size: 48px 48px;
-      min-height: 560px;
+    .viewport-shell {
       position: relative;
+      min-height: 620px;
+      background:
+        radial-gradient(circle at 42% 22%, rgba(98, 182, 255, 0.10), transparent 34%),
+        linear-gradient(180deg, #101923 0%, #0d131a 100%);
     }
-    svg {
-      width: 100%;
-      height: 560px;
+    canvas {
       display: block;
+      width: 100%;
+      height: 620px;
+    }
+    .viewport-toolbar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .viewport-toolbar > div {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      pointer-events: auto;
+    }
+    .hud {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      width: calc(100% - 24px);
+      pointer-events: none;
+    }
+    .hud-chip,
+    .legend-chip {
+      border: 1px solid rgba(121, 147, 170, 0.32);
+      background: rgba(16, 24, 33, 0.88);
+      border-radius: 8px;
+      padding: 10px;
+      backdrop-filter: blur(10px);
+    }
+    .hud-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .hud-value {
+      font-size: 15px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
     }
     .controls {
       display: grid;
@@ -124,7 +167,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border-top: 1px solid var(--line);
       background: var(--band);
     }
-    button {
+    button,
+    select {
       border: 1px solid var(--line);
       background: var(--panel-2);
       color: var(--text);
@@ -134,42 +178,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       cursor: pointer;
     }
     button:hover { border-color: var(--blue); }
-    select {
-      border: 1px solid var(--line);
-      background: var(--panel-2);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 9px 10px;
-      font-weight: 700;
-    }
+    button.active { border-color: var(--blue); color: var(--blue); background: #17293a; }
     input[type="range"] { width: 100%; accent-color: var(--blue); }
-    .state-strip {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      padding: 12px 16px;
-      border-top: 1px solid var(--line);
-      background: #0f151c;
-    }
-    .state-chip {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel-2);
-      padding: 10px;
-      min-height: 64px;
-    }
-    .state-label {
-      color: var(--muted);
-      font-size: 11px;
-      margin-bottom: 7px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .state-value {
-      font-size: 15px;
-      font-weight: 800;
-      overflow-wrap: anywhere;
-    }
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -195,7 +205,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .event-list {
       display: grid;
       gap: 8px;
-      max-height: 460px;
+      max-height: 500px;
       overflow: auto;
       padding-right: 4px;
     }
@@ -275,17 +285,30 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       line-height: 1.45;
       color: #dcecff;
     }
-    .arm-line { stroke-width: 16; stroke-linecap: round; fill: none; }
-    .arm-left { stroke: var(--blue); }
-    .arm-right { stroke: var(--violet); }
-    .part { transition: transform 360ms ease, opacity 240ms ease; }
-    .ghost { opacity: 0.2; }
-    .label { fill: var(--muted); font-size: 13px; }
-    .small-label { fill: var(--muted); font-size: 11px; }
-    .fixture-ok { stroke: var(--green); }
-    .fixture-alert { stroke: var(--red); }
+    .legend {
+      position: absolute;
+      right: 12px;
+      bottom: 112px;
+      display: grid;
+      gap: 6px;
+      width: 178px;
+      pointer-events: none;
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
     .recording-mode main {
-      width: min(1280px, calc(100vw - 24px));
+      width: min(1320px, calc(100vw - 24px));
       padding-top: 12px;
     }
     .recording-mode header,
@@ -296,24 +319,26 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .recording-mode .layout {
       grid-template-columns: 1fr;
     }
-    .recording-mode svg {
-      height: 720px;
+    .recording-mode canvas {
+      height: 780px;
     }
-    .recording-mode .stage {
-      min-height: 720px;
+    .recording-mode .viewport-shell {
+      min-height: 780px;
     }
-    @media (max-width: 1080px) {
+    @media (max-width: 1120px) {
       .layout { grid-template-columns: 1fr; }
-      .stage, svg { min-height: 460px; height: 460px; }
+      .viewport-shell { min-height: 520px; }
+      canvas { height: 520px; }
       .details { grid-template-columns: 1fr; }
-      .state-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media (max-width: 680px) {
-      main { width: min(100vw - 24px, 1440px); padding-top: 18px; }
+    @media (max-width: 720px) {
+      main { width: min(100vw - 24px, 1480px); padding-top: 18px; }
       header { grid-template-columns: 1fr; }
       .controls { grid-template-columns: 1fr 1fr; }
       .metric-grid { grid-template-columns: 1fr; }
-      .state-strip { grid-template-columns: 1fr; }
+      .hud { grid-template-columns: 1fr; }
+      .legend { display: none; }
     }
   </style>
 </head>
@@ -322,79 +347,48 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     <header>
       <div>
         <h1>Dual-Arm Autonomous Microfactory</h1>
-        <p class="subhead">Vision-guided assembly replay: two arms build a mini conveyor, detect failures, recover, run a final functional test, and generate an acceptance log.</p>
+        <p class="subhead">RoboDK/RViz-style replay: two arms assemble a mini conveyor, visualize planned motion, detect failures, recover, and produce acceptance evidence.</p>
       </div>
       <div id="final-pill" class="pill">RUN</div>
     </header>
 
     <section class="layout">
       <div class="panel">
-        <div class="stage">
-          <svg viewBox="0 0 900 560" role="img" aria-label="Animated microfactory cell replay">
-            <defs>
-              <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.35"/>
-              </filter>
-            </defs>
-            <rect x="38" y="42" width="824" height="458" rx="18" fill="#101923" stroke="#314150"/>
-            <rect x="70" y="96" width="210" height="322" rx="12" fill="#172330" stroke="#334557"/>
-            <rect x="620" y="96" width="210" height="322" rx="12" fill="#172330" stroke="#334557"/>
-            <text x="82" y="124" class="label">Loose parts tray</text>
-            <text x="632" y="124" class="label">Installed / reject area</text>
-            <rect id="fixture" x="345" y="218" width="210" height="124" rx="14" fill="#1b2632" stroke="#4b6175" stroke-width="3" filter="url(#softShadow)"/>
-            <text x="386" y="290" class="label">assembly fixture</text>
-            <rect id="conveyorBase" class="part ghost" x="372" y="250" width="156" height="36" rx="6" fill="#6ee7e7"/>
-            <circle id="rollerA" class="part ghost" cx="398" cy="252" r="14" fill="#f2c14e"/>
-            <circle id="rollerB" class="part ghost" cx="502" cy="252" r="14" fill="#f2c14e"/>
-            <path id="beltPath" class="part ghost" d="M398 236 C430 220 470 220 502 236 M398 268 C430 284 470 284 502 268" fill="none" stroke="#57d68d" stroke-width="8" stroke-linecap="round"/>
-            <rect id="motorPart" class="part ghost" x="520" y="248" width="36" height="38" rx="7" fill="#b99cff"/>
-            <rect id="sensorPart" class="part ghost" x="354" y="296" width="34" height="22" rx="4" fill="#62b6ff"/>
-            <circle id="puck" class="part ghost" cx="388" cy="270" r="8" fill="#ffffff"/>
-
-            <path id="leftArm" class="arm-line arm-left" d="M190 472 L238 376 L316 316"/>
-            <circle cx="190" cy="472" r="28" fill="#163247" stroke="#62b6ff" stroke-width="3"/>
-            <circle id="leftTool" cx="316" cy="316" r="14" fill="#62b6ff"/>
-            <text x="142" y="520" class="label">left arm</text>
-            <path id="rightArm" class="arm-line arm-right" d="M710 472 L662 376 L584 316"/>
-            <circle cx="710" cy="472" r="28" fill="#2c2247" stroke="#b99cff" stroke-width="3"/>
-            <circle id="rightTool" cx="584" cy="316" r="14" fill="#b99cff"/>
-            <text x="668" y="520" class="label">right arm</text>
-
-            <g id="looseParts">
-              <rect id="looseBase" class="part" x="110" y="168" width="106" height="30" rx="5" fill="#6ee7e7"/>
-              <circle id="looseRoller1" class="part" cx="128" cy="250" r="17" fill="#f2c14e"/>
-              <circle id="looseRoller2" class="part" cx="198" cy="250" r="17" fill="#f2c14e"/>
-              <path id="looseBelt" class="part" d="M110 326 C136 300 204 300 230 326 C204 352 136 352 110 326" fill="none" stroke="#57d68d" stroke-width="10" stroke-linecap="round"/>
-              <rect id="looseMotor" class="part" x="106" y="366" width="44" height="42" rx="7" fill="#b99cff"/>
-              <rect id="looseSensor" class="part" x="196" y="370" width="42" height="28" rx="4" fill="#62b6ff"/>
-            </g>
-
-            <g id="visionCone">
-              <path d="M450 68 L342 214 L558 214 Z" fill="#62b6ff" opacity="0.08" stroke="#62b6ff" stroke-opacity="0.25"/>
-              <rect x="410" y="42" width="80" height="34" rx="7" fill="#24384a" stroke="#62b6ff"/>
-              <text x="424" y="64" class="small-label">RGB-D</text>
-            </g>
-
-            <text id="phaseText" x="70" y="462" class="label">Waiting for replay</text>
-            <text id="detailText" x="70" y="484" class="small-label"></text>
-          </svg>
-        </div>
-        <div class="state-strip">
-          <div class="state-chip">
-            <div class="state-label">Sim Time</div>
-            <div class="state-value" id="currentTime">0.0s</div>
+        <div class="viewport-shell">
+          <canvas id="robotViewport" width="1400" height="860" aria-label="Robotics workcell viewport"></canvas>
+          <div class="viewport-toolbar">
+            <div>
+              <button class="active" data-view="iso">Iso</button>
+              <button data-view="top">Top</button>
+              <button data-view="side">Side</button>
+            </div>
+            <div>
+              <button id="fitViewBtn">Fit View</button>
+            </div>
           </div>
-          <div class="state-chip">
-            <div class="state-label">Phase</div>
-            <div class="state-value" id="currentPhase">idle</div>
+          <div class="legend legend-chip">
+            <div class="legend-row"><span class="swatch" style="background:#62b6ff"></span>left arm</div>
+            <div class="legend-row"><span class="swatch" style="background:#b99cff"></span>right arm</div>
+            <div class="legend-row"><span class="swatch" style="background:#57d68d"></span>accepted</div>
+            <div class="legend-row"><span class="swatch" style="background:#ff6b6b"></span>fault</div>
           </div>
-          <div class="state-chip">
-            <div class="state-label">Status</div>
-            <div class="state-value" id="currentStatus">pending</div>
-          </div>
-          <div class="state-chip">
-            <div class="state-label">Focus</div>
-            <div class="state-value" id="currentFocus">full sequence</div>
+          <div class="hud">
+            <div class="hud-chip">
+              <div class="hud-label">Sim Time</div>
+              <div class="hud-value" id="currentTime">0.0s</div>
+            </div>
+            <div class="hud-chip">
+              <div class="hud-label">Phase</div>
+              <div class="hud-value" id="currentPhase">idle</div>
+            </div>
+            <div class="hud-chip">
+              <div class="hud-label">Status</div>
+              <div class="hud-value" id="currentStatus">pending</div>
+            </div>
+            <div class="hud-chip">
+              <div class="hud-label">Focus</div>
+              <div class="hud-value" id="currentFocus">full sequence</div>
+            </div>
           </div>
         </div>
         <div class="controls">
@@ -437,9 +431,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         <div class="panel-body">
           <h2>What This Proves</h2>
           <div class="callout">
-            This is not a happy-path pick-and-place. The cell logs perception confidence,
-            motion plans, bimanual fixture stabilization, failure detection, autonomous recovery,
-            and a final functional acceptance test.
+            This is not a happy-path pick-and-place. The replay visualizes tool motion,
+            planned paths, perception confidence, bimanual stabilization, autonomous recovery,
+            and the final functional test from generated event data.
           </div>
           <div style="margin-top: 12px;">
             <button id="copySummaryBtn">Copy Run Summary</button>
@@ -467,15 +461,52 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
   <script>
     const payload = __PAYLOAD__;
     const events = payload.events;
+    const canvas = document.getElementById("robotViewport");
+    const ctx = canvas.getContext("2d");
     let index = 0;
     let playing = false;
     let timer = null;
     let playbackMs = 420;
     let eventFilter = "all";
+    let viewMode = "iso";
+    let animationFrame = null;
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
     const criticalPhases = new Set(["active_vision", "bimanual_coordination", "functional_test"]);
+    const colors = {
+      left: "#62b6ff",
+      right: "#b99cff",
+      accepted: "#57d68d",
+      warning: "#f2c14e",
+      fault: "#ff6b6b",
+      grid: "rgba(128, 159, 184, 0.22)",
+      text: "#dce7f2",
+      muted: "#8da0b2",
+      base: "#6ee7e7",
+      roller: "#f2c14e",
+      belt: "#57d68d",
+      motor: "#b99cff",
+      sensor: "#62b6ff",
+    };
+
+    const world = {
+      leftBase: { x: -2.7, y: 1.35, z: 0 },
+      rightBase: { x: 2.7, y: 1.35, z: 0 },
+      tray: { x: -2.45, y: -0.75, z: 0 },
+      reject: { x: 2.45, y: -0.75, z: 0 },
+      fixture: { x: 0, y: 0, z: 0 },
+      camera: { x: 0, y: -2.1, z: 2.9 },
+    };
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.max(900, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(520, Math.floor(rect.height * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      drawScene();
+    }
 
     function setText(id, value) {
       el(id).textContent = value;
@@ -502,101 +533,458 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       return events.map((event, i) => [event, i]);
     }
 
-    function partVisible(id, visible) {
-      const node = el(id);
-      node.classList.toggle("ghost", !visible);
-      node.style.opacity = visible ? "1" : "0.18";
+    function currentEvent() {
+      return events[Math.max(0, Math.min(index, events.length - 1))];
     }
 
-    function moveTool(arm, x, y) {
-      const tool = el(arm === "left_arm" ? "leftTool" : "rightTool");
-      tool.setAttribute("cx", x);
-      tool.setAttribute("cy", y);
-      const path = el(arm === "left_arm" ? "leftArm" : "rightArm");
-      const base = arm === "left_arm" ? [190, 472] : [710, 472];
-      const elbow = arm === "left_arm" ? [238, 376] : [662, 376];
-      path.setAttribute("d", `M${base[0]} ${base[1]} L${elbow[0]} ${elbow[1]} L${x} ${y}`);
+    function project(point) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const scale = Math.min(w / 7.2, h / 5.1);
+      const cx = w * 0.5;
+      const cy = h * 0.61;
+      if (viewMode === "top") {
+        return { x: cx + point.x * scale, y: cy + point.y * scale, z: point.z };
+      }
+      if (viewMode === "side") {
+        return { x: cx + point.x * scale, y: cy - point.z * scale * 0.9 + point.y * scale * 0.12, z: point.z };
+      }
+      return {
+        x: cx + (point.x - point.y) * scale * 0.78,
+        y: cy + (point.x + point.y) * scale * 0.36 - point.z * scale * 0.9,
+        z: point.z,
+      };
     }
 
-    function resetScene() {
-      ["conveyorBase", "rollerA", "rollerB", "beltPath", "motorPart", "sensorPart", "puck"].forEach((id) => partVisible(id, false));
-      ["looseBase", "looseRoller1", "looseRoller2", "looseBelt", "looseMotor", "looseSensor"].forEach((id) => partVisible(id, true));
-      moveTool("left_arm", 316, 316);
-      moveTool("right_arm", 584, 316);
-      el("fixture").setAttribute("stroke", "#4b6175");
-      setText("phaseText", "Waiting for replay");
-      setText("detailText", "");
+    function sceneState(eventIndex = index) {
+      const state = {
+        installed: new Set(),
+        hiddenLoose: new Set(),
+        beltColor: colors.belt,
+        fixtureColor: "#526b7f",
+        leftTool: { x: -1.25, y: 0.25, z: 1.35 },
+        rightTool: { x: 1.25, y: 0.25, z: 1.35 },
+        leftTarget: null,
+        rightTarget: null,
+        plannedPath: null,
+        cameraPulse: false,
+        activePose: null,
+        puckProgress: 0,
+        status: "idle",
+      };
+
+      for (let i = 0; i <= eventIndex; i += 1) {
+        const event = events[i];
+        const msg = event.message.toLowerCase();
+        const details = event.details || {};
+        state.status = event.status;
+        if (event.status === "fail") {
+          state.fixtureColor = colors.fault;
+        } else if (event.status === "recovered") {
+          state.fixtureColor = colors.left;
+        }
+        if (event.phase === "perception" || event.phase === "active_vision") {
+          state.cameraPulse = true;
+          const detection = details.detection;
+          if (detection) {
+            state.activePose = poseToWorld(detection.pose, detection.kind);
+          }
+        }
+        if (event.phase === "motion_planning" && details.plan) {
+          const target = planTargetToWorld(details.plan);
+          state.plannedPath = {
+            arm: details.plan.arm,
+            start: details.plan.arm === "left_arm" ? state.leftTool : state.rightTool,
+            target,
+            clearance: details.plan.min_clearance_mm,
+            status: details.plan.status,
+          };
+          if (details.plan.arm === "left_arm") {
+            state.leftTarget = target;
+            state.leftTool = target;
+          } else {
+            state.rightTarget = target;
+            state.rightTool = target;
+          }
+        }
+        if (event.phase === "bimanual_coordination") {
+          if (details.assist_arm === "left_arm") {
+            state.leftTool = { x: -0.42, y: 0.05, z: 0.75 };
+          }
+          if (details.assist_arm === "right_arm") {
+            state.rightTool = { x: 0.42, y: 0.05, z: 0.75 };
+          }
+        }
+        if (event.phase === "execution") {
+          if (msg.includes("left_arm")) {
+            state.leftTool = { x: -0.28, y: -0.02, z: 0.62 };
+          }
+          if (msg.includes("right_arm")) {
+            state.rightTool = { x: 0.28, y: -0.02, z: 0.62 };
+          }
+        }
+        if (msg.includes("installed base")) {
+          state.hiddenLoose.add("base");
+          state.installed.add("base");
+        }
+        if (msg.includes("installed roller")) {
+          if (!state.installed.has("rollerA")) {
+            state.hiddenLoose.add("rollerA");
+            state.installed.add("rollerA");
+          } else {
+            state.hiddenLoose.add("rollerB");
+            state.installed.add("rollerB");
+          }
+        }
+        if (msg.includes("belt placed") || msg.includes("belt slip")) {
+          state.hiddenLoose.add("belt");
+          state.installed.add("belt");
+          state.beltColor = event.status === "fail" ? colors.fault : colors.belt;
+        }
+        if (msg.includes("re-tensioning")) {
+          state.beltColor = colors.left;
+        }
+        if (msg.includes("installed motor")) {
+          state.hiddenLoose.add("motor");
+          state.installed.add("motor");
+        }
+        if (msg.includes("installed sensor")) {
+          state.hiddenLoose.add("sensor");
+          state.installed.add("sensor");
+        }
+        if (event.phase === "functional_test" && event.status === "pass") {
+          state.fixtureColor = colors.accepted;
+          state.puckProgress = 1;
+        }
+      }
+      return state;
     }
 
-    function applyEvent(event) {
-      setText("phaseText", `${event.phase} [${event.status}]`);
-      setText("detailText", event.message);
-      el("fixture").setAttribute("stroke", event.status === "fail" ? "#ff6b6b" : event.status === "recovered" ? "#62b6ff" : "#4b6175");
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
 
-      const msg = event.message.toLowerCase();
-      const phase = event.phase;
-      const details = event.details || {};
-      const arm = details.arm || details.active_arm || (msg.includes("left_arm") ? "left_arm" : msg.includes("right_arm") ? "right_arm" : null);
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
 
-      if (phase === "perception" || phase === "active_vision") {
-        el("visionCone").style.opacity = event.status === "fail" ? "0.35" : "1";
+    function lerpPoint(a, b, t) {
+      return {
+        x: lerp(a.x, b.x, t),
+        y: lerp(a.y, b.y, t),
+        z: lerp(a.z, b.z, t),
+      };
+    }
+
+    function lerpScene(from, to, t) {
+      const eased = easeInOut(t);
+      return {
+        ...to,
+        leftTool: lerpPoint(from.leftTool, to.leftTool, eased),
+        rightTool: lerpPoint(from.rightTool, to.rightTool, eased),
+        puckProgress: lerp(from.puckProgress, to.puckProgress, eased),
+      };
+    }
+
+    function poseToWorld(pose, kind) {
+      const kindOffsets = {
+        base_plate: { x: -2.45, y: -0.95, z: 0.1 },
+        roller: { x: -2.55, y: -0.45, z: 0.16 },
+        belt: { x: -2.35, y: 0.08, z: 0.14 },
+        motor: { x: -2.75, y: 0.65, z: 0.18 },
+        sensor: { x: -2.08, y: 0.68, z: 0.16 },
+      };
+      return kindOffsets[kind] || { x: -2.35, y: -0.5, z: 0.2 };
+    }
+
+    function planTargetToWorld(plan) {
+      const target = plan.target || {};
+      const x = Number(target.x ?? 0);
+      const y = Number(target.y ?? 0);
+      const z = Number(target.z ?? 0.2);
+      if (Math.abs(x) < 0.03 && Math.abs(y) < 0.03) {
+        return { x: plan.arm === "left_arm" ? -0.18 : 0.18, y: 0.0, z: 0.76 };
       }
-      if (phase === "motion_planning" && details.plan) {
-        moveTool(details.plan.arm, details.plan.arm === "left_arm" ? 356 : 544, 228);
+      return {
+        x: Math.max(-2.85, Math.min(2.85, (x - 0.35) * 6.0)),
+        y: Math.max(-1.3, Math.min(1.35, (y - 0.42) * 5.0)),
+        z: Math.max(0.22, Math.min(1.5, z * 6.0)),
+      };
+    }
+
+    function clearCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      const gradient = ctx.createLinearGradient(0, 0, 0, rect.height);
+      gradient.addColorStop(0, "#111b25");
+      gradient.addColorStop(1, "#0c1118");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+
+    function line3(a, b, color, width = 1.5, dash = []) {
+      const pa = project(a);
+      const pb = project(b);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.setLineDash(dash);
+      ctx.beginPath();
+      ctx.moveTo(pa.x, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function fillEllipse3(center, rx, ry, color, stroke = "rgba(255,255,255,0.18)") {
+      const p = project(center);
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawLabel(text, point, color = colors.muted) {
+      const p = project(point);
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = "12px Inter, Segoe UI, sans-serif";
+      ctx.fillText(text, p.x + 8, p.y - 8);
+      ctx.restore();
+    }
+
+    function drawBox(center, size, color, stroke = "rgba(255,255,255,0.22)") {
+      const p = project({ x: center.x, y: center.y, z: center.z + size.z });
+      const base = project(center);
+      const w = size.x * 72;
+      const d = size.y * 32;
+      const h = Math.max(8, (base.y - p.y));
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(p.x - w / 2, p.y - h / 2, w, Math.max(10, h), 4);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.fillRect(p.x - w / 2, p.y - h / 2, w, 5);
+      if (d > 0) {
+        ctx.strokeStyle = "rgba(0,0,0,0.28)";
+        ctx.strokeRect(p.x - w / 2 + 4, p.y - h / 2 + 4, w, Math.max(10, h));
       }
-      if (phase === "bimanual_coordination") {
-        moveTool(details.assist_arm, details.assist_arm === "left_arm" ? 344 : 556, 308);
+      ctx.restore();
+    }
+
+    function drawGrid() {
+      for (let i = -4; i <= 4; i += 0.5) {
+        const major = Math.abs(i % 1) < 0.01;
+        line3({ x: -4, y: i, z: 0 }, { x: 4, y: i, z: 0 }, major ? "rgba(128,159,184,0.26)" : "rgba(128,159,184,0.12)", major ? 1.3 : 0.8);
+        line3({ x: i, y: -2.4, z: 0 }, { x: i, y: 2.3, z: 0 }, major ? "rgba(128,159,184,0.26)" : "rgba(128,159,184,0.12)", major ? 1.3 : 0.8);
       }
-      if (phase === "execution" && arm) {
-        moveTool(arm, arm === "left_arm" ? 386 : 514, 260);
+      line3({ x: 0, y: 0, z: 0 }, { x: 1.2, y: 0, z: 0 }, "#ff6b6b", 3);
+      line3({ x: 0, y: 0, z: 0 }, { x: 0, y: 1.2, z: 0 }, "#57d68d", 3);
+      line3({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1.2 }, "#62b6ff", 3);
+      drawLabel("X", { x: 1.25, y: 0, z: 0 }, "#ff8f8f");
+      drawLabel("Y", { x: 0, y: 1.25, z: 0 }, "#8ff0b5");
+      drawLabel("Z", { x: 0, y: 0, z: 1.25 }, "#9ed0ff");
+    }
+
+    function drawCamera(state) {
+      drawBox(world.camera, { x: 0.6, y: 0.32, z: 0.18 }, "rgba(36,56,74,0.95)", colors.left);
+      const targetA = { x: -0.95, y: -0.35, z: 0 };
+      const targetB = { x: 0.95, y: -0.35, z: 0 };
+      const targetC = { x: 0.95, y: 0.95, z: 0 };
+      const targetD = { x: -0.95, y: 0.95, z: 0 };
+      const pulse = state.cameraPulse ? "rgba(98,182,255,0.36)" : "rgba(98,182,255,0.16)";
+      [targetA, targetB, targetC, targetD].forEach((target) => line3(world.camera, target, pulse, 1.2, [5, 5]));
+      line3(targetA, targetB, pulse, 1);
+      line3(targetB, targetC, pulse, 1);
+      line3(targetC, targetD, pulse, 1);
+      line3(targetD, targetA, pulse, 1);
+      drawLabel("RGB-D camera", { x: world.camera.x + 0.25, y: world.camera.y, z: world.camera.z + 0.2 }, colors.left);
+    }
+
+    function drawWorkcell(state) {
+      drawBox({ x: world.tray.x, y: world.tray.y, z: 0.02 }, { x: 1.45, y: 1.25, z: 0.10 }, "rgba(23,35,48,0.92)", "#334557");
+      drawLabel("loose parts", { x: world.tray.x - 0.58, y: world.tray.y - 0.56, z: 0.18 });
+      drawBox({ x: world.reject.x, y: world.reject.y, z: 0.02 }, { x: 1.45, y: 1.25, z: 0.10 }, "rgba(23,35,48,0.92)", "#334557");
+      drawLabel("installed / reject", { x: world.reject.x - 0.58, y: world.reject.y - 0.56, z: 0.18 });
+      drawBox({ x: 0, y: 0, z: 0.05 }, { x: 1.55, y: 1.0, z: 0.24 }, "rgba(27,38,50,0.96)", state.fixtureColor);
+      drawLabel("assembly fixture", { x: -0.52, y: -0.48, z: 0.4 }, state.fixtureColor);
+
+      if (!state.hiddenLoose.has("base")) drawBox({ x: -2.7, y: -1.0, z: 0.18 }, { x: 0.85, y: 0.28, z: 0.12 }, colors.base);
+      if (!state.hiddenLoose.has("rollerA")) fillEllipse3({ x: -2.85, y: -0.45, z: 0.26 }, 16, 10, colors.roller);
+      if (!state.hiddenLoose.has("rollerB")) fillEllipse3({ x: -2.35, y: -0.42, z: 0.26 }, 16, 10, colors.roller);
+      if (!state.hiddenLoose.has("belt")) drawBelt({ x: -2.58, y: 0.18, z: 0.22 }, 0.75, 0.26, colors.belt);
+      if (!state.hiddenLoose.has("motor")) drawBox({ x: -2.92, y: 0.75, z: 0.22 }, { x: 0.32, y: 0.32, z: 0.26 }, colors.motor);
+      if (!state.hiddenLoose.has("sensor")) drawBox({ x: -2.16, y: 0.76, z: 0.18 }, { x: 0.34, y: 0.22, z: 0.14 }, colors.sensor);
+
+      if (state.installed.has("base")) drawBox({ x: 0, y: 0, z: 0.28 }, { x: 1.18, y: 0.36, z: 0.12 }, colors.base);
+      if (state.installed.has("rollerA")) fillEllipse3({ x: -0.42, y: 0, z: 0.48 }, 18, 10, colors.roller);
+      if (state.installed.has("rollerB")) fillEllipse3({ x: 0.42, y: 0, z: 0.48 }, 18, 10, colors.roller);
+      if (state.installed.has("belt")) drawBelt({ x: 0, y: 0, z: 0.52 }, 1.0, 0.26, state.beltColor);
+      if (state.installed.has("motor")) drawBox({ x: 0.78, y: 0.02, z: 0.45 }, { x: 0.28, y: 0.3, z: 0.24 }, colors.motor);
+      if (state.installed.has("sensor")) drawBox({ x: -0.72, y: 0.32, z: 0.42 }, { x: 0.32, y: 0.18, z: 0.14 }, colors.sensor);
+      if (state.puckProgress > 0) {
+        fillEllipse3({ x: -0.42 + state.puckProgress * 0.86, y: 0.04, z: 0.68 }, 9, 6, "#ffffff", "rgba(255,255,255,0.55)");
       }
-      if (msg.includes("installed base")) {
-        partVisible("looseBase", false);
-        partVisible("conveyorBase", true);
+    }
+
+    function drawBelt(center, width, depth, color) {
+      const a = project({ x: center.x - width / 2, y: center.y - depth / 2, z: center.z });
+      const b = project({ x: center.x + width / 2, y: center.y - depth / 2, z: center.z });
+      const c = project({ x: center.x + width / 2, y: center.y + depth / 2, z: center.z });
+      const d = project({ x: center.x - width / 2, y: center.y + depth / 2, z: center.z });
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 7;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.lineTo(c.x, c.y);
+      ctx.lineTo(d.x, d.y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawRobotArm(base, tool, color, label) {
+      const shoulder = { x: base.x, y: base.y, z: 0.62 };
+      const elbow = {
+        x: base.x * 0.58 + tool.x * 0.42,
+        y: base.y * 0.58 + tool.y * 0.42,
+        z: Math.max(0.95, tool.z + 0.35),
+      };
+      drawBox({ x: base.x, y: base.y, z: 0.08 }, { x: 0.42, y: 0.42, z: 0.18 }, "rgba(27,38,50,0.98)", color);
+      line3(shoulder, elbow, color, 8);
+      line3(elbow, tool, color, 8);
+      fillEllipse3(shoulder, 12, 8, color);
+      fillEllipse3(elbow, 10, 7, color);
+      fillEllipse3(tool, 9, 6, color);
+      drawLabel(label, { x: base.x - 0.2, y: base.y + 0.18, z: 0.32 }, color);
+    }
+
+    function drawPlannedPath(state) {
+      if (!state.plannedPath) return;
+      const path = state.plannedPath;
+      const color = path.status === "warn" ? colors.warning : colors.left;
+      line3(path.start, path.target, color, 2.5, [8, 6]);
+      fillEllipse3(path.target, 12, 8, color, "rgba(255,255,255,0.35)");
+      drawLabel(`${path.arm.replace("_arm", "")} target / ${path.clearance}mm clearance`, { x: path.target.x + 0.1, y: path.target.y, z: path.target.z + 0.2 }, color);
+    }
+
+    function drawActivePose(state) {
+      if (!state.activePose) return;
+      const p = state.activePose;
+      line3({ x: p.x - 0.18, y: p.y, z: p.z }, { x: p.x + 0.18, y: p.y, z: p.z }, colors.yellow, 2);
+      line3({ x: p.x, y: p.y - 0.18, z: p.z }, { x: p.x, y: p.y + 0.18, z: p.z }, colors.yellow, 2);
+      line3({ x: p.x, y: p.y, z: p.z - 0.12 }, { x: p.x, y: p.y, z: p.z + 0.18 }, colors.yellow, 2);
+      drawLabel("pose estimate", { x: p.x + 0.08, y: p.y + 0.08, z: p.z + 0.16 }, colors.yellow);
+    }
+
+    function drawScene(state = sceneState()) {
+      clearCanvas();
+      drawGrid();
+      drawCamera(state);
+      drawWorkcell(state);
+      drawPlannedPath(state);
+      drawActivePose(state);
+      drawRobotArm(world.leftBase, state.leftTool, colors.left, "left arm");
+      drawRobotArm(world.rightBase, state.rightTool, colors.right, "right arm");
+      drawViewportText(state);
+    }
+
+    function animateScene(from, to) {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
       }
-      if (msg.includes("installed roller") && el("rollerA").classList.contains("ghost")) {
-        partVisible("looseRoller1", false);
-        partVisible("rollerA", true);
-      } else if (msg.includes("installed roller")) {
-        partVisible("looseRoller2", false);
-        partVisible("rollerB", true);
+      const durationMs = Math.min(380, Math.max(180, playbackMs * 0.72));
+      const started = performance.now();
+      const frame = (now) => {
+        const t = Math.min(1, (now - started) / durationMs);
+        drawScene(lerpScene(from, to, t));
+        if (t < 1) {
+          animationFrame = requestAnimationFrame(frame);
+        } else {
+          animationFrame = null;
+          drawScene(to);
+        }
+      };
+      animationFrame = requestAnimationFrame(frame);
+    }
+
+    function drawViewportText(state) {
+      const rect = canvas.getBoundingClientRect();
+      const event = currentEvent();
+      ctx.save();
+      ctx.fillStyle = "rgba(12, 16, 22, 0.70)";
+      ctx.strokeStyle = "rgba(128, 159, 184, 0.24)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(18, rect.height - 96, Math.min(720, rect.width - 36), 72, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = statusToColor(event.status);
+      ctx.font = "700 14px Inter, Segoe UI, sans-serif";
+      ctx.fillText(`${event.phase} [${event.status}]`, 34, rect.height - 64);
+      ctx.fillStyle = colors.text;
+      ctx.font = "13px Inter, Segoe UI, sans-serif";
+      wrapText(event.message, 34, rect.height - 40, Math.min(680, rect.width - 76), 17);
+      ctx.restore();
+    }
+
+    function wrapText(text, x, y, maxWidth, lineHeight) {
+      const words = text.split(" ");
+      let line = "";
+      for (const word of words) {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = word;
+          y += lineHeight;
+        } else {
+          line = test;
+        }
       }
-      if (msg.includes("belt placed") || msg.includes("belt slip")) {
-        partVisible("looseBelt", false);
-        partVisible("beltPath", true);
-        el("beltPath").setAttribute("stroke", event.status === "fail" ? "#ff6b6b" : "#57d68d");
-      }
-      if (msg.includes("re-tensioning")) {
-        el("beltPath").setAttribute("stroke", "#62b6ff");
-      }
-      if (msg.includes("installed motor")) {
-        partVisible("looseMotor", false);
-        partVisible("motorPart", true);
-      }
-      if (msg.includes("installed sensor")) {
-        partVisible("looseSensor", false);
-        partVisible("sensorPart", true);
-      }
-      if (phase === "functional_test" && event.status === "pass") {
-        partVisible("puck", true);
-        el("puck").style.transform = "translate(102px, 0)";
-        el("fixture").setAttribute("stroke", "#57d68d");
-      }
+      ctx.fillText(line, x, y);
+    }
+
+    function statusToColor(status) {
+      if (status === "fail") return colors.fault;
+      if (status === "warn") return colors.warning;
+      if (status === "recovered") return colors.left;
+      return colors.accepted;
     }
 
     function renderAt(nextIndex) {
+      const oldIndex = index;
+      const from = sceneState(oldIndex);
       index = Math.max(0, Math.min(nextIndex, events.length - 1));
-      resetScene();
-      for (let i = 0; i <= index; i += 1) {
-        applyEvent(events[i]);
-      }
-      const current = events[index];
+      const target = sceneState(index);
+      const current = currentEvent();
       setText("currentTime", `${current.sim_time_s.toFixed(1)}s`);
       setText("currentPhase", current.phase);
       setText("currentStatus", current.status);
       setText("currentFocus", isCritical(current) ? "critical event" : "normal sequence");
       el("scrubber").value = String(index);
       setText("stepLabel", `${index + 1} / ${events.length}`);
+      if (Math.abs(index - oldIndex) === 1) {
+        animateScene(from, target);
+      } else {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+        drawScene(target);
+      }
       document.querySelectorAll(".event").forEach((node) => node.classList.remove("active"));
       const active = document.querySelector(`[data-event-index="${index}"]`);
       if (active) {
@@ -626,9 +1014,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
 
     function restartPlaybackIfNeeded() {
-      if (!playing) {
-        return;
-      }
+      if (!playing) return;
       clearInterval(timer);
       playing = false;
       play();
@@ -713,12 +1099,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         </div>
       `).join("") || `<div class="event"><div class="event-msg">No events match this filter.</div></div>`;
       document.querySelectorAll(".event").forEach((node) => {
-        if (!node.dataset.eventIndex) {
-          return;
-        }
+        if (!node.dataset.eventIndex) return;
         node.addEventListener("click", () => renderAt(Number(node.dataset.eventIndex)));
       });
-      const critical = events.filter((event) => event.status !== "pass" || ["active_vision", "bimanual_coordination", "functional_test"].includes(event.phase));
+      const critical = events.filter((event) => isCritical(event));
       el("criticalRows").innerHTML = critical.map((event) => `
         <tr>
           <td>${event.sequence}</td>
@@ -747,8 +1131,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       el("recordingModeBtn").textContent = document.body.classList.contains("recording-mode")
         ? "Exit Recording"
         : "Recording";
+      requestAnimationFrame(resizeCanvas);
     });
     el("copySummaryBtn").addEventListener("click", copyRunSummary);
+    el("fitViewBtn").addEventListener("click", resizeCanvas);
     document.querySelectorAll("[data-filter]").forEach((button) => {
       button.addEventListener("click", () => {
         eventFilter = button.dataset.filter;
@@ -758,11 +1144,21 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         renderAt(index);
       });
     });
+    document.querySelectorAll("[data-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        viewMode = button.dataset.view;
+        document.querySelectorAll("[data-view]").forEach((node) => node.classList.remove("active"));
+        button.classList.add("active");
+        drawScene();
+      });
+    });
     el("scrubber").max = String(Math.max(0, events.length - 1));
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
+    window.addEventListener("resize", resizeCanvas);
 
     renderMetrics();
     renderEvents();
+    resizeCanvas();
     renderAt(0);
   </script>
 </body>

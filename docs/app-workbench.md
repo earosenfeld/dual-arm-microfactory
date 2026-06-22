@@ -21,7 +21,10 @@ Open the generated `runs/<timestamp>-linkedin-demo/index.html`.
 - Recording mode that hides nonessential panels and enlarges the replay for screen capture.
 
 Each scenario dashboard also includes playback speed, jump-to-critical controls, event
-filters, live state chips, a copyable run summary, and its own recording mode.
+filters, live state chips, a copyable run summary, and its own recording mode. The
+main replay is a canvas-based robotics viewport with floor grid, coordinate axes,
+camera frustum, trays, fixture, robot links, tool poses, planned paths, and installed
+parts rendered from the event log.
 
 ## Why This Matters
 

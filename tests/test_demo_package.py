@@ -25,6 +25,9 @@ class DemoPackageTests(unittest.TestCase):
                 dashboard = output_dir / scenario / "dashboard.html"
                 self.assertTrue(dashboard.exists())
                 dashboard_html = dashboard.read_text(encoding="utf-8")
+                self.assertIn("robotViewport", dashboard_html)
+                self.assertIn("RoboDK/RViz-style", dashboard_html)
+                self.assertIn("data-view=\"iso\"", dashboard_html)
                 self.assertIn("speedSelect", dashboard_html)
                 self.assertIn("nextCriticalBtn", dashboard_html)
                 self.assertIn("filterBar", dashboard_html)

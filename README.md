@@ -36,6 +36,8 @@ The repository currently includes a deterministic simulation core:
 - Failure injection for belt slip, clamp failure, and low-confidence vision.
 - Markdown acceptance report and single-file HTML dashboard output.
 - LinkedIn demo package generation.
+- RoboDK/RViz-style canvas viewport with grid floor, axes, robot links, tool motion,
+  planned paths, camera frustum, and event-driven assembly state.
 
 Run it:
 
