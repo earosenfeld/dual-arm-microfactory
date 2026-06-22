@@ -22,7 +22,13 @@ class DemoPackageTests(unittest.TestCase):
             self.assertIn("Scenario Workbench", index)
             self.assertIn("recordingModeButton", index)
             for scenario in DEMO_SCENARIOS:
-                self.assertTrue((output_dir / scenario / "dashboard.html").exists())
+                dashboard = output_dir / scenario / "dashboard.html"
+                self.assertTrue(dashboard.exists())
+                dashboard_html = dashboard.read_text(encoding="utf-8")
+                self.assertIn("speedSelect", dashboard_html)
+                self.assertIn("nextCriticalBtn", dashboard_html)
+                self.assertIn("filterBar", dashboard_html)
+                self.assertIn("copySummaryBtn", dashboard_html)
                 self.assertTrue((output_dir / scenario / "acceptance_report.md").exists())
                 self.assertTrue((output_dir / scenario / "metrics.json").exists())
 

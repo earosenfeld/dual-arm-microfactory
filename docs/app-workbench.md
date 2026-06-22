@@ -20,6 +20,9 @@ Open the generated `runs/<timestamp>-linkedin-demo/index.html`.
 - Direct links to the acceptance report, event log, metrics JSON, and LinkedIn post draft.
 - Recording mode that hides nonessential panels and enlarges the replay for screen capture.
 
+Each scenario dashboard also includes playback speed, jump-to-critical controls, event
+filters, live state chips, a copyable run summary, and its own recording mode.
+
 ## Why This Matters
 
 The workbench makes the project look like an integrated robotics application, not a pile of

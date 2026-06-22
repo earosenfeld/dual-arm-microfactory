@@ -14,9 +14,9 @@ Open the generated `index.html`, then open the `belt_slip` dashboard first.
 2. Open `belt_slip/dashboard.html`.
 3. Press `Play`.
 4. Pause when the belt slip failure appears.
-5. Resume so the recovery and final functional test are visible.
-6. Show the metrics cards.
-7. Scroll briefly to `Critical Events`.
+5. Use `Next Critical` to jump through the failure, recovery, and final functional test.
+6. Show the metrics cards and live state chips.
+7. Toggle the `Critical` filter in the timeline.
 8. End on the final `PASS` status.
 
 ## Narration

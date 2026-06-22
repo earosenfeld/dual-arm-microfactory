@@ -117,7 +117,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
     .controls {
       display: grid;
-      grid-template-columns: auto auto minmax(180px, 1fr) auto;
+      grid-template-columns: auto auto auto auto minmax(180px, 1fr) auto auto;
       gap: 10px;
       align-items: center;
       padding: 12px 16px;
@@ -134,7 +134,42 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       cursor: pointer;
     }
     button:hover { border-color: var(--blue); }
+    select {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-weight: 700;
+    }
     input[type="range"] { width: 100%; accent-color: var(--blue); }
+    .state-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      background: #0f151c;
+    }
+    .state-chip {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      padding: 10px;
+      min-height: 64px;
+    }
+    .state-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .state-value {
+      font-size: 15px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -160,9 +195,24 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .event-list {
       display: grid;
       gap: 8px;
-      max-height: 514px;
+      max-height: 460px;
       overflow: auto;
       padding-right: 4px;
+    }
+    .filter-bar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .filter-bar button {
+      padding: 8px 10px;
+      color: var(--muted);
+    }
+    .filter-bar button.active {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: #17293a;
     }
     .event {
       border: 1px solid var(--line);
@@ -234,16 +284,36 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .small-label { fill: var(--muted); font-size: 11px; }
     .fixture-ok { stroke: var(--green); }
     .fixture-alert { stroke: var(--red); }
+    .recording-mode main {
+      width: min(1280px, calc(100vw - 24px));
+      padding-top: 12px;
+    }
+    .recording-mode header,
+    .recording-mode .details,
+    .recording-mode aside {
+      display: none;
+    }
+    .recording-mode .layout {
+      grid-template-columns: 1fr;
+    }
+    .recording-mode svg {
+      height: 720px;
+    }
+    .recording-mode .stage {
+      min-height: 720px;
+    }
     @media (max-width: 1080px) {
       .layout { grid-template-columns: 1fr; }
       .stage, svg { min-height: 460px; height: 460px; }
       .details { grid-template-columns: 1fr; }
+      .state-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 680px) {
       main { width: min(100vw - 24px, 1440px); padding-top: 18px; }
       header { grid-template-columns: 1fr; }
       .controls { grid-template-columns: 1fr 1fr; }
       .metric-grid { grid-template-columns: 1fr; }
+      .state-strip { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -309,10 +379,37 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
             <text id="detailText" x="70" y="484" class="small-label"></text>
           </svg>
         </div>
+        <div class="state-strip">
+          <div class="state-chip">
+            <div class="state-label">Sim Time</div>
+            <div class="state-value" id="currentTime">0.0s</div>
+          </div>
+          <div class="state-chip">
+            <div class="state-label">Phase</div>
+            <div class="state-value" id="currentPhase">idle</div>
+          </div>
+          <div class="state-chip">
+            <div class="state-label">Status</div>
+            <div class="state-value" id="currentStatus">pending</div>
+          </div>
+          <div class="state-chip">
+            <div class="state-label">Focus</div>
+            <div class="state-value" id="currentFocus">full sequence</div>
+          </div>
+        </div>
         <div class="controls">
           <button id="playBtn">Play</button>
           <button id="resetBtn">Reset</button>
+          <button id="prevCriticalBtn">Prev Critical</button>
+          <button id="nextCriticalBtn">Next Critical</button>
           <input id="scrubber" type="range" min="0" max="0" value="0" step="1" aria-label="Replay scrubber">
+          <select id="speedSelect" aria-label="Playback speed">
+            <option value="700">0.6x</option>
+            <option value="420" selected>1x</option>
+            <option value="240">1.75x</option>
+            <option value="120">3.5x</option>
+          </select>
+          <button id="recordingModeBtn">Recording</button>
           <span id="stepLabel" class="muted">0 / 0</span>
         </div>
       </div>
@@ -324,6 +421,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         </div>
         <div class="panel-body" style="border-top: 1px solid var(--line);">
           <h2>Replay Timeline</h2>
+          <div class="filter-bar" id="filterBar">
+            <button class="active" data-filter="all">All</button>
+            <button data-filter="critical">Critical</button>
+            <button data-filter="recovery">Recovery</button>
+            <button data-filter="planning">Planning</button>
+          </div>
           <div class="event-list" id="eventList"></div>
         </div>
       </aside>
@@ -337,6 +440,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
             This is not a happy-path pick-and-place. The cell logs perception confidence,
             motion plans, bimanual fixture stabilization, failure detection, autonomous recovery,
             and a final functional acceptance test.
+          </div>
+          <div style="margin-top: 12px;">
+            <button id="copySummaryBtn">Copy Run Summary</button>
           </div>
         </div>
       </div>
@@ -364,12 +470,36 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     let index = 0;
     let playing = false;
     let timer = null;
+    let playbackMs = 420;
+    let eventFilter = "all";
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
+    const criticalPhases = new Set(["active_vision", "bimanual_coordination", "functional_test"]);
 
     function setText(id, value) {
       el(id).textContent = value;
+    }
+
+    function isCritical(event) {
+      return event.status !== "pass" || criticalPhases.has(event.phase);
+    }
+
+    function isPlanning(event) {
+      return event.phase === "motion_planning" || event.phase === "grasp_planning";
+    }
+
+    function filteredEvents() {
+      if (eventFilter === "critical") {
+        return events.map((event, i) => [event, i]).filter(([event]) => isCritical(event));
+      }
+      if (eventFilter === "recovery") {
+        return events.map((event, i) => [event, i]).filter(([event]) => event.status === "recovered" || event.phase === "recovery");
+      }
+      if (eventFilter === "planning") {
+        return events.map((event, i) => [event, i]).filter(([event]) => isPlanning(event));
+      }
+      return events.map((event, i) => [event, i]);
     }
 
     function partVisible(id, visible) {
@@ -460,6 +590,11 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       for (let i = 0; i <= index; i += 1) {
         applyEvent(events[i]);
       }
+      const current = events[index];
+      setText("currentTime", `${current.sim_time_s.toFixed(1)}s`);
+      setText("currentPhase", current.phase);
+      setText("currentStatus", current.status);
+      setText("currentFocus", isCritical(current) ? "critical event" : "normal sequence");
       el("scrubber").value = String(index);
       setText("stepLabel", `${index + 1} / ${events.length}`);
       document.querySelectorAll(".event").forEach((node) => node.classList.remove("active"));
@@ -487,7 +622,60 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
           return;
         }
         renderAt(index + 1);
-      }, 420);
+      }, playbackMs);
+    }
+
+    function restartPlaybackIfNeeded() {
+      if (!playing) {
+        return;
+      }
+      clearInterval(timer);
+      playing = false;
+      play();
+    }
+
+    function jumpCritical(direction) {
+      const start = index + direction;
+      for (let i = start; i >= 0 && i < events.length; i += direction) {
+        if (isCritical(events[i])) {
+          renderAt(i);
+          return;
+        }
+      }
+    }
+
+    function runSummaryText() {
+      const m = payload.metrics;
+      return [
+        "Dual-Arm Autonomous Microfactory replay",
+        `Final status: ${m.final_status}`,
+        `Recoveries: ${m.recovered_events}`,
+        `Active vision events: ${m.active_vision_events}`,
+        `Bimanual assists: ${m.bimanual_events}`,
+        `Motion plans: ${m.motion_plan_count}`,
+        `Minimum clearance: ${m.minimum_clearance_mm} mm`,
+        `Average planning time: ${m.average_planning_time_ms} ms`,
+        `Simulated elapsed time: ${m.simulated_elapsed_s}s`,
+      ].join("\\n");
+    }
+
+    async function copyRunSummary() {
+      const text = runSummaryText();
+      try {
+        await navigator.clipboard.writeText(text);
+        el("copySummaryBtn").textContent = "Copied";
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        el("copySummaryBtn").textContent = "Copied";
+      }
+      setTimeout(() => {
+        el("copySummaryBtn").textContent = "Copy Run Summary";
+      }, 1400);
     }
 
     function renderMetrics() {
@@ -514,7 +702,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
 
     function renderEvents() {
-      el("eventList").innerHTML = events.map((event, i) => `
+      const rows = filteredEvents();
+      el("eventList").innerHTML = rows.map(([event, i]) => `
         <div class="event" data-event-index="${i}">
           <div class="event-top">
             <span>#${event.sequence} ${event.phase}</span>
@@ -522,8 +711,11 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
           </div>
           <div class="event-msg">${event.message}</div>
         </div>
-      `).join("");
+      `).join("") || `<div class="event"><div class="event-msg">No events match this filter.</div></div>`;
       document.querySelectorAll(".event").forEach((node) => {
+        if (!node.dataset.eventIndex) {
+          return;
+        }
         node.addEventListener("click", () => renderAt(Number(node.dataset.eventIndex)));
       });
       const critical = events.filter((event) => event.status !== "pass" || ["active_vision", "bimanual_coordination", "functional_test"].includes(event.phase));
@@ -543,6 +735,28 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       clearInterval(timer);
       el("playBtn").textContent = "Play";
       renderAt(0);
+    });
+    el("prevCriticalBtn").addEventListener("click", () => jumpCritical(-1));
+    el("nextCriticalBtn").addEventListener("click", () => jumpCritical(1));
+    el("speedSelect").addEventListener("change", (event) => {
+      playbackMs = Number(event.target.value);
+      restartPlaybackIfNeeded();
+    });
+    el("recordingModeBtn").addEventListener("click", () => {
+      document.body.classList.toggle("recording-mode");
+      el("recordingModeBtn").textContent = document.body.classList.contains("recording-mode")
+        ? "Exit Recording"
+        : "Recording";
+    });
+    el("copySummaryBtn").addEventListener("click", copyRunSummary);
+    document.querySelectorAll("[data-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        eventFilter = button.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach((node) => node.classList.remove("active"));
+        button.classList.add("active");
+        renderEvents();
+        renderAt(index);
+      });
     });
     el("scrubber").max = String(Math.max(0, events.length - 1));
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
