@@ -21,6 +21,7 @@ class DemoPackageTests(unittest.TestCase):
             index = (output_dir / "index.html").read_text(encoding="utf-8")
             self.assertIn("Scenario Workbench", index)
             self.assertIn("recordingModeButton", index)
+            self.assertIn("?embed=1", index)
             for scenario in DEMO_SCENARIOS:
                 dashboard = output_dir / scenario / "dashboard.html"
                 self.assertTrue(dashboard.exists())
@@ -35,6 +36,8 @@ class DemoPackageTests(unittest.TestCase):
                 self.assertIn("icon-logo", dashboard_html)
                 self.assertIn("icon-robot", dashboard_html)
                 self.assertIn("timelineMini", dashboard_html)
+                self.assertIn("embed-mode", dashboard_html)
+                self.assertIn("data-display=\"robots\"", dashboard_html)
                 self.assertIn("data-view=\"iso\"", dashboard_html)
                 self.assertIn("speedSelect", dashboard_html)
                 self.assertIn("nextCriticalBtn", dashboard_html)

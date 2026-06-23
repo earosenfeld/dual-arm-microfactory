@@ -286,6 +286,28 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       background: linear-gradient(180deg, #20262e, #1a2027);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
     }
+    button.display-row {
+      width: 100%;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      min-height: 38px;
+      padding: 7px 8px;
+      justify-content: stretch;
+    }
+    button.display-row:hover {
+      border-color: rgba(46,230,214,0.45);
+    }
+    button.display-row.off {
+      color: var(--muted);
+      background: #15191e;
+    }
+    button.display-row.off .display-check {
+      color: var(--muted);
+      border-color: rgba(167,176,190,0.24);
+      background: rgba(167,176,190,0.06);
+      box-shadow: none;
+    }
     .display-check {
       width: 22px;
       height: 22px;
@@ -852,6 +874,31 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .recording-mode .sim-shell { grid-template-columns: 1fr; }
     .recording-mode #robotViewport { height: 86vh; }
     .recording-mode .viewport-panel { min-height: 86vh; }
+    .embed-mode main {
+      width: 100%;
+      padding: 0;
+    }
+    .embed-mode header,
+    .embed-mode .details,
+    .embed-mode .status-strip,
+    .embed-mode .statusbar,
+    .embed-mode .left-panel,
+    .embed-mode .right-panel {
+      display: none;
+    }
+    .embed-mode .sim-shell {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .embed-mode .viewport-panel {
+      min-height: 760px;
+      border: 0;
+      border-radius: 0;
+    }
+    .embed-mode #robotViewport {
+      height: 720px;
+      min-height: 720px;
+    }
     @media (max-width: 1280px) {
       .sim-shell { grid-template-columns: 1fr; }
       .left-panel { order: 2; }
@@ -1038,11 +1085,11 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         </div>
         <div class="panel-body">
           <div class="display-list">
-            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-cube"></use></svg></span><span>Planning scene</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-robot"></use></svg></span><span>Robot links</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-target"></use></svg></span><span>Safety envelopes</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-camera"></use></svg></span><span>Camera frustum</span><span>on</span></div>
-            <div class="display-row"><span class="display-check"><svg class="icon"><use href="#icon-route"></use></svg></span><span>Toolpath waypoints</span><span>on</span></div>
+            <button class="display-row active" data-display="scene"><span class="display-check"><svg class="icon"><use href="#icon-cube"></use></svg></span><span>Planning scene</span><span class="display-state">on</span></button>
+            <button class="display-row active" data-display="robots"><span class="display-check"><svg class="icon"><use href="#icon-robot"></use></svg></span><span>Robot links</span><span class="display-state">on</span></button>
+            <button class="display-row active" data-display="envelopes"><span class="display-check"><svg class="icon"><use href="#icon-target"></use></svg></span><span>Safety envelopes</span><span class="display-state">on</span></button>
+            <button class="display-row active" data-display="camera"><span class="display-check"><svg class="icon"><use href="#icon-camera"></use></svg></span><span>Camera frustum</span><span class="display-state">on</span></button>
+            <button class="display-row active" data-display="paths"><span class="display-check"><svg class="icon"><use href="#icon-route"></use></svg></span><span>Toolpath waypoints</span><span class="display-state">on</span></button>
           </div>
         </div>
         <div class="panel-header">
@@ -1200,12 +1247,22 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     const payload = __PAYLOAD__;
     const events = payload.events;
     const viewport = document.getElementById("robotViewport");
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.body.classList.add("embed-mode");
+    }
     let index = 0;
     let playing = false;
     let timer = null;
     let playbackMs = 420;
     let eventFilter = "all";
     let showGhosts = true;
+    const displayState = {
+      scene: true,
+      robots: true,
+      envelopes: true,
+      camera: true,
+      paths: true,
+    };
     let tween = null;
     let cameraTarget = new THREE.Vector3(0, 0.18, 0.35);
     let orbit = { yaw: -0.78, pitch: 0.58, radius: 6.2 };
@@ -1469,8 +1526,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
       objects.cameraFrustum = new THREE.LineSegments(geometry, materials.camera);
       groups.overlays.add(objects.cameraFrustum);
-      const cameraBody = addBox(groups.overlays, [0, 2.75, -1.95], [0.55, 0.26, 0.22], materials.sensor);
-      cameraBody.rotation.x = -0.25;
+      objects.cameraBody = addBox(groups.overlays, [0, 2.75, -1.95], [0.55, 0.26, 0.22], materials.sensor);
+      objects.cameraBody.rotation.x = -0.25;
       addLabel("RGB-D", [0.28, 2.62, -1.95]);
     }
 
@@ -1662,7 +1719,22 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     }
 
     function setGhostVisibility(visible) {
-      groups.ghosts.visible = visible;
+      groups.ghosts.visible = visible && displayState.scene;
+    }
+
+    function applyDisplayState() {
+      groups.cell.visible = displayState.scene;
+      groups.parts.visible = displayState.scene;
+      groups.ghosts.visible = displayState.scene && showGhosts;
+      groups.robots.visible = displayState.robots;
+      if (objects.leftEnvelope) objects.leftEnvelope.visible = displayState.envelopes;
+      if (objects.rightEnvelope) objects.rightEnvelope.visible = displayState.envelopes;
+      if (objects.cameraFrustum) objects.cameraFrustum.visible = displayState.camera;
+      if (objects.cameraBody) objects.cameraBody.visible = displayState.camera;
+      if (objects.pathLine) objects.pathLine.visible = displayState.paths && Boolean(objects.pathLine.userData.active);
+      if (objects.waypoints) objects.waypoints.visible = displayState.paths;
+      if (objects.targetMarker) objects.targetMarker.visible = displayState.paths && Boolean(objects.targetMarker.userData.active);
+      if (objects.poseCrosshair) objects.poseCrosshair.visible = displayState.paths && Boolean(objects.poseCrosshair.userData.active);
     }
 
     function applySceneState(state) {
@@ -1697,6 +1769,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       updateRobot(objects.rightRobot, state.rightTool);
       updatePath(state);
       updatePoseCrosshair(state);
+      applyDisplayState();
       renderSceneTree(state);
       renderPlanningStack(state);
       updateToolReadouts(state);
@@ -1704,7 +1777,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
 
     function updatePath(state) {
       if (!state.plannedPath) {
+        objects.pathLine.userData.active = false;
         objects.pathLine.visible = false;
+        objects.targetMarker.userData.active = false;
         objects.targetMarker.visible = false;
         clearGroup(objects.waypoints);
         return;
@@ -1718,8 +1793,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       objects.pathLine.geometry.dispose();
       objects.pathLine.geometry = new THREE.BufferGeometry().setFromPoints(points);
       objects.pathLine.material = path.status === "warn" ? materials.faultLine : materials.path;
-      objects.pathLine.visible = true;
-      objects.targetMarker.visible = true;
+      objects.pathLine.userData.active = true;
+      objects.pathLine.visible = displayState.paths;
+      objects.targetMarker.userData.active = true;
+      objects.targetMarker.visible = displayState.paths;
       objects.targetMarker.position.copy(points[2]);
       clearGroup(objects.waypoints);
       points.forEach((point, i) => {
@@ -1739,10 +1816,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
 
     function updatePoseCrosshair(state) {
       if (!state.activePose) {
+        objects.poseCrosshair.userData.active = false;
         objects.poseCrosshair.visible = false;
         return;
       }
-      objects.poseCrosshair.visible = true;
+      objects.poseCrosshair.userData.active = true;
+      objects.poseCrosshair.visible = displayState.paths;
       objects.poseCrosshair.position.copy(state.activePose);
     }
 
@@ -2157,6 +2236,17 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       }, 1400);
     }
 
+    function syncDisplayButtons() {
+      document.querySelectorAll("[data-display]").forEach((button) => {
+        const key = button.dataset.display;
+        const active = Boolean(displayState[key]);
+        button.classList.toggle("off", !active);
+        button.classList.toggle("active", active);
+        const label = button.querySelector(".display-state");
+        if (label) label.textContent = active ? "on" : "off";
+      });
+    }
+
     el("playBtn").addEventListener("click", play);
     el("resetBtn").addEventListener("click", () => {
       playing = false;
@@ -2205,12 +2295,21 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         setView(button.dataset.view);
       });
     });
+    document.querySelectorAll("[data-display]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.display;
+        displayState[key] = !displayState[key];
+        syncDisplayButtons();
+        applyDisplayState();
+      });
+    });
     el("scrubber").max = String(Math.max(0, events.length - 1));
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
     window.addEventListener("resize", resizeRenderer);
 
     renderMetrics();
     renderEvents();
+    syncDisplayButtons();
     resizeRenderer();
     setView("iso");
     renderAt(0);
