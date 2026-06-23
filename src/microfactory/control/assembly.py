@@ -7,6 +7,7 @@ from microfactory.control.recovery import RecoveryPolicy
 from microfactory.perception.vision import SimulatedVisionSystem
 from microfactory.planning.grasp import GraspPlanner
 from microfactory.planning.motion import MotionPlanner
+from microfactory.ports import GraspPlannerPort, MotionPlannerPort, RecoveryPort, VisionPort
 from microfactory.reporting.events import EventLog
 
 
@@ -20,10 +21,10 @@ class AssemblyResult:
 class ConveyorAssemblyController:
     def __init__(
         self,
-        vision: SimulatedVisionSystem | None = None,
-        grasp_planner: GraspPlanner | None = None,
-        motion_planner: MotionPlanner | None = None,
-        recovery: RecoveryPolicy | None = None,
+        vision: VisionPort | None = None,
+        grasp_planner: GraspPlannerPort | None = None,
+        motion_planner: MotionPlannerPort | None = None,
+        recovery: RecoveryPort | None = None,
     ) -> None:
         self.vision = vision or SimulatedVisionSystem()
         self.grasp_planner = grasp_planner or GraspPlanner()

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python unit tests
+        run: PYTHONPATH=src python -m unittest discover -s tests
+
+      - name: Python compile check
+        run: PYTHONPATH=src python -m compileall src scripts
+
+      - name: Verify committed public demo
+        run: PYTHONPATH=src python scripts/verify_public_demo.py
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.61.0
+          npx playwright install --with-deps chromium
+
+      - name: Browser smoke test
+        run: |
+          python -m http.server 8770 &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8770/docs/demo/index.html >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          DEMO_URL=http://127.0.0.1:8770/docs/demo/ node tests/browser_smoke.js

@@ -44,6 +44,15 @@ The target demo:
 - Learned subskills are planned as bounded local policies, not as the safety-critical
   system owner.
 
+![Architecture diagram showing supervisor-centered ports](docs/assets/architecture.svg)
+
+## Simulation Boundary
+
+This repository currently ships a deterministic simulation and replay system. It does
+not command physical robots, read a real RGB-D camera, run MoveIt 2, or talk to a PLC.
+Those integrations are isolated behind ports so the same supervisor, event log, and
+dashboard can be reused when hardware adapters are added.
+
 ## Current MVP
 
 The repository currently includes a deterministic simulation core:

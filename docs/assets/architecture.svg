@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc">
+  <title id="title">Dual-arm microfactory architecture</title>
+  <desc id="desc">Supervisor-centered robotics architecture with simulation ports for vision, planning, execution, fixture IO, event logging, and dashboard replay.</desc>
+  <defs>
+    <style>
+      .bg { fill: #090a0c; }
+      .panel { fill: #151a20; stroke: #34404d; stroke-width: 2; rx: 10; }
+      .core { fill: #132626; stroke: #2ee6d6; stroke-width: 3; rx: 10; }
+      .future { fill: #1c2028; stroke: #ff9f1c; stroke-width: 2; stroke-dasharray: 8 7; rx: 10; }
+      .text { fill: #f5f7fa; font: 700 20px Inter, Segoe UI, Arial, sans-serif; }
+      .small { fill: #b7c0cd; font: 500 14px Inter, Segoe UI, Arial, sans-serif; }
+      .label { fill: #2ee6d6; font: 800 13px Inter, Segoe UI, Arial, sans-serif; }
+      .future-label { fill: #ff9f1c; font: 800 13px Inter, Segoe UI, Arial, sans-serif; }
+      .line { stroke: #6f849b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .logline { stroke: #43e07f; stroke-width: 2.5; fill: none; marker-end: url(#greenArrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6f849b" />
+    </marker>
+    <marker id="greenArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#43e07f" />
+    </marker>
+  </defs>
+  <rect class="bg" width="1120" height="520" />
+
+  <rect class="core" x="390" y="180" width="340" height="150" />
+  <text class="label" x="420" y="220">DETERMINISTIC CORE</text>
+  <text class="text" x="420" y="254">Assembly Supervisor</text>
+  <text class="small" x="420" y="286">state transitions, recovery, acceptance</text>
+
+  <rect class="panel" x="60" y="50" width="250" height="110" />
+  <text class="label" x="90" y="90">VISION PORT</text>
+  <text class="text" x="90" y="124">RGB-D Pose Estimate</text>
+  <text class="small" x="90" y="146">simulated now, camera later</text>
+
+  <rect class="panel" x="60" y="360" width="250" height="110" />
+  <text class="label" x="90" y="400">PLANNING PORT</text>
+  <text class="text" x="90" y="434">Grasp + Motion Plan</text>
+  <text class="small" x="90" y="456">deterministic now, MoveIt later</text>
+
+  <rect class="future" x="810" y="50" width="250" height="110" />
+  <text class="future-label" x="840" y="90">EXECUTION PORT</text>
+  <text class="text" x="840" y="124">Robot Trajectories</text>
+  <text class="small" x="840" y="146">ROS 2 action adapter target</text>
+
+  <rect class="future" x="810" y="205" width="250" height="110" />
+  <text class="future-label" x="840" y="245">FIXTURE IO PORT</text>
+  <text class="text" x="840" y="279">PLC / Sensors</text>
+  <text class="small" x="840" y="301">Modbus, OPC UA, test signals</text>
+
+  <rect class="panel" x="810" y="360" width="250" height="110" />
+  <text class="label" x="840" y="400">EVIDENCE</text>
+  <text class="text" x="840" y="434">Event Log + Replay</text>
+  <text class="small" x="840" y="456">dashboard, metrics, report</text>
+
+  <path class="line" d="M310 105 C350 105 350 205 390 225" />
+  <path class="line" d="M310 415 C350 415 350 305 390 285" />
+  <path class="line" d="M730 220 C780 205 775 115 810 105" />
+  <path class="line" d="M730 260 C775 260 775 260 810 260" />
+  <path class="logline" d="M730 305 C780 350 785 410 810 415" />
+
+  <text class="small" x="425" y="380">Learning models may propose bounded local subskills.</text>
+  <text class="small" x="425" y="404">The supervisor still owns state, recovery, and acceptance.</text>
+</svg>
