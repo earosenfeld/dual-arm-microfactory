@@ -1,0 +1,151 @@
+{
+  "job_id": "JOB-CONVEYOR-NOMINAL",
+  "fixture": {
+    "id": "fixture-conveyor-a",
+    "pose": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "roll": 0.0,
+      "pitch": 0.0,
+      "yaw": 0.0
+    },
+    "installed": {
+      "base_plate": [
+        "base-001"
+      ],
+      "roller": [
+        "roller-001",
+        "roller-002"
+      ],
+      "belt": [
+        "belt-001"
+      ],
+      "motor": [
+        "motor-001"
+      ],
+      "sensor": [
+        "sensor-001"
+      ]
+    },
+    "belt_seated": true,
+    "clamp_closed": true,
+    "functional_test_passed": true
+  },
+  "parts": {
+    "base-001": {
+      "id": "base-001",
+      "kind": "base_plate",
+      "pose": {
+        "x": 0.18,
+        "y": 0.42,
+        "z": 0.03,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.04
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "roller-001": {
+      "id": "roller-001",
+      "kind": "roller",
+      "pose": {
+        "x": 0.32,
+        "y": 0.37,
+        "z": 0.04,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 1.48
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "roller-002": {
+      "id": "roller-002",
+      "kind": "roller",
+      "pose": {
+        "x": 0.28,
+        "y": 0.49,
+        "z": 0.04,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 1.61
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "belt-001": {
+      "id": "belt-001",
+      "kind": "belt",
+      "pose": {
+        "x": 0.43,
+        "y": 0.45,
+        "z": 0.02,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.12
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "motor-001": {
+      "id": "motor-001",
+      "kind": "motor",
+      "pose": {
+        "x": 0.51,
+        "y": 0.36,
+        "z": 0.05,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": -0.2
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "sensor-001": {
+      "id": "sensor-001",
+      "kind": "sensor",
+      "pose": {
+        "x": 0.49,
+        "y": 0.53,
+        "z": 0.03,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.03
+      },
+      "state": "installed",
+      "metadata": {}
+    },
+    "fastener-001": {
+      "id": "fastener-001",
+      "kind": "fastener",
+      "pose": {
+        "x": 0.6,
+        "y": 0.39,
+        "z": 0.01,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.0
+      },
+      "state": "loose",
+      "metadata": {}
+    },
+    "fastener-002": {
+      "id": "fastener-002",
+      "kind": "fastener",
+      "pose": {
+        "x": 0.62,
+        "y": 0.43,
+        "z": 0.01,
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.0
+      },
+      "state": "loose",
+      "metadata": {}
+    }
+  },
+  "active_failures": [],
+  "cycle_time_s": 39.0
+}

@@ -1,0 +1,1588 @@
+[
+  {
+    "sequence": 1,
+    "timestamp": "2026-06-23T20:35:58.662+00:00",
+    "sim_time_s": 0.0,
+    "phase": "job",
+    "message": "Started autonomous assembly for JOB-CONVEYOR-WRONG_PART",
+    "status": "pass",
+    "details": {}
+  },
+  {
+    "sequence": 2,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 0.8,
+    "phase": "recovery",
+    "message": "Rejected sensor-001; part number does not match job requirement",
+    "status": "recovered",
+    "details": {
+      "part": {
+        "id": "sensor-001",
+        "kind": "sensor",
+        "pose": {
+          "x": 0.49,
+          "y": 0.53,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.03
+        },
+        "state": "rejected",
+        "metadata": {
+          "part_number": "SENSOR-REV-B",
+          "expected_part_number": "SENSOR-REV-C"
+        }
+      }
+    }
+  },
+  {
+    "sequence": 3,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 1.6,
+    "phase": "perception",
+    "message": "Detected base_plate candidate base-001",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "base-001",
+        "kind": "base_plate",
+        "pose": {
+          "x": 0.1809056068382391,
+          "y": 0.41743461772000523,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.04
+        },
+        "confidence": 0.838,
+        "occlusion": 0.238,
+        "view_id": "view-001"
+      }
+    }
+  },
+  {
+    "sequence": 4,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 2.4,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for base-001",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "base-001",
+        "arm": "left_arm",
+        "pose": {
+          "x": 0.1809056068382391,
+          "y": 0.41743461772000523,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.04
+        },
+        "score": 0.838,
+        "clearance_mm": 22.0,
+        "reason": "top-side pinch grasp"
+      }
+    }
+  },
+  {
+    "sequence": 5,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 3.2,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.1809056068382391,
+          "y": 0.41743461772000523,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.04
+        },
+        "planning_time_ms": 283,
+        "path_length_mm": 674.42,
+        "min_clearance_mm": 25.88,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 6,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 4.0,
+    "phase": "execution",
+    "message": "left_arm picked base-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "base-001",
+        "kind": "base_plate",
+        "pose": {
+          "x": 0.18,
+          "y": 0.42,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.04
+        },
+        "state": "picked",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 7,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 4.8,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 191,
+        "path_length_mm": 454.95,
+        "min_clearance_mm": 29.18,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 8,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 5.6,
+    "phase": "execution",
+    "message": "Installed base_plate base-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "base-001",
+        "kind": "base_plate",
+        "pose": {
+          "x": 0.18,
+          "y": 0.42,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.04
+        },
+        "state": "installed",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 9,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 6.4,
+    "phase": "verification",
+    "message": "Verified fixture contains base_plate",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ]
+        },
+        "belt_seated": false,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 10,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 7.2,
+    "phase": "perception",
+    "message": "Detected roller candidate roller-001",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "roller-001",
+        "kind": "roller",
+        "pose": {
+          "x": 0.31734799354864823,
+          "y": 0.3700446143991365,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.48
+        },
+        "confidence": 0.864,
+        "occlusion": 0.276,
+        "view_id": "view-002"
+      }
+    }
+  },
+  {
+    "sequence": 11,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 8.0,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for roller-001",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "roller-001",
+        "arm": "right_arm",
+        "pose": {
+          "x": 0.31734799354864823,
+          "y": 0.3700446143991365,
+          "z": 0.13,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.48
+        },
+        "score": 0.864,
+        "clearance_mm": 22.0,
+        "reason": "top-side pinch grasp"
+      }
+    }
+  },
+  {
+    "sequence": 12,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 8.8,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.31734799354864823,
+          "y": 0.3700446143991365,
+          "z": 0.13,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.48
+        },
+        "planning_time_ms": 151,
+        "path_length_mm": 360.62,
+        "min_clearance_mm": 30.59,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 13,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 9.6,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": -0.08,
+          "z": 0.18,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 178,
+        "path_length_mm": 425.21,
+        "min_clearance_mm": 29.62,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 14,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 10.4,
+    "phase": "bimanual_coordination",
+    "message": "left_arm stabilizes fixture while right_arm installs roller",
+    "status": "pass",
+    "details": {
+      "assist_arm": "left_arm",
+      "active_arm": "right_arm",
+      "part_kind": "roller"
+    }
+  },
+  {
+    "sequence": 15,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 11.2,
+    "phase": "execution",
+    "message": "right_arm picked roller-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "roller-001",
+        "kind": "roller",
+        "pose": {
+          "x": 0.32,
+          "y": 0.37,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.48
+        },
+        "state": "picked",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 16,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 12.0,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 204,
+        "path_length_mm": 487.59,
+        "min_clearance_mm": 28.69,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 17,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 12.8,
+    "phase": "execution",
+    "message": "Installed roller roller-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "roller-001",
+        "kind": "roller",
+        "pose": {
+          "x": 0.32,
+          "y": 0.37,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.48
+        },
+        "state": "installed",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 18,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 13.6,
+    "phase": "verification",
+    "message": "Verified fixture contains roller",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ]
+        },
+        "belt_seated": false,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 19,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 14.4,
+    "phase": "perception",
+    "message": "Detected roller candidate roller-002",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "roller-002",
+        "kind": "roller",
+        "pose": {
+          "x": 0.27741913254144773,
+          "y": 0.4875442780800632,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.61
+        },
+        "confidence": 0.872,
+        "occlusion": 0.187,
+        "view_id": "view-003"
+      }
+    }
+  },
+  {
+    "sequence": 20,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 15.2,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for roller-002",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "roller-002",
+        "arm": "right_arm",
+        "pose": {
+          "x": 0.27741913254144773,
+          "y": 0.4875442780800632,
+          "z": 0.13,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.61
+        },
+        "score": 0.872,
+        "clearance_mm": 22.0,
+        "reason": "top-side pinch grasp"
+      }
+    }
+  },
+  {
+    "sequence": 21,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 16.0,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.27741913254144773,
+          "y": 0.4875442780800632,
+          "z": 0.13,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.61
+        },
+        "planning_time_ms": 195,
+        "path_length_mm": 465.85,
+        "min_clearance_mm": 29.01,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 22,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 16.8,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": -0.08,
+          "z": 0.18,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 178,
+        "path_length_mm": 425.21,
+        "min_clearance_mm": 29.62,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 23,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 17.6,
+    "phase": "bimanual_coordination",
+    "message": "left_arm stabilizes fixture while right_arm installs roller",
+    "status": "pass",
+    "details": {
+      "assist_arm": "left_arm",
+      "active_arm": "right_arm",
+      "part_kind": "roller"
+    }
+  },
+  {
+    "sequence": 24,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 18.4,
+    "phase": "execution",
+    "message": "right_arm picked roller-002",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "roller-002",
+        "kind": "roller",
+        "pose": {
+          "x": 0.28,
+          "y": 0.49,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.61
+        },
+        "state": "picked",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 25,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 19.2,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 235,
+        "path_length_mm": 561.04,
+        "min_clearance_mm": 27.58,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 26,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 20.0,
+    "phase": "execution",
+    "message": "Installed roller roller-002",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "roller-002",
+        "kind": "roller",
+        "pose": {
+          "x": 0.28,
+          "y": 0.49,
+          "z": 0.04,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 1.61
+        },
+        "state": "installed",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 27,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 20.8,
+    "phase": "verification",
+    "message": "Verified fixture contains roller",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ]
+        },
+        "belt_seated": false,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 28,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 21.6,
+    "phase": "perception",
+    "message": "Detected belt candidate belt-001",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "belt-001",
+        "kind": "belt",
+        "pose": {
+          "x": 0.4277428117668979,
+          "y": 0.44833943378764207,
+          "z": 0.02,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.12
+        },
+        "confidence": 0.919,
+        "occlusion": 0.256,
+        "view_id": "view-004"
+      }
+    }
+  },
+  {
+    "sequence": 29,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 22.4,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for belt-001",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "belt-001",
+        "arm": "left_arm",
+        "pose": {
+          "x": 0.4277428117668979,
+          "y": 0.44833943378764207,
+          "z": 0.11,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.12
+        },
+        "score": 0.839,
+        "clearance_mm": 15.0,
+        "reason": "edge pinch with belt stretch allowance"
+      }
+    }
+  },
+  {
+    "sequence": 30,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 23.2,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.4277428117668979,
+          "y": 0.44833943378764207,
+          "z": 0.11,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.12
+        },
+        "planning_time_ms": 377,
+        "path_length_mm": 899.51,
+        "min_clearance_mm": 22.51,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 31,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 24.0,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.0,
+          "y": -0.08,
+          "z": 0.18,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 178,
+        "path_length_mm": 425.21,
+        "min_clearance_mm": 29.62,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 32,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 24.8,
+    "phase": "bimanual_coordination",
+    "message": "right_arm stabilizes fixture while left_arm installs belt",
+    "status": "pass",
+    "details": {
+      "assist_arm": "right_arm",
+      "active_arm": "left_arm",
+      "part_kind": "belt"
+    }
+  },
+  {
+    "sequence": 33,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 25.6,
+    "phase": "execution",
+    "message": "left_arm picked belt-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "belt-001",
+        "kind": "belt",
+        "pose": {
+          "x": 0.43,
+          "y": 0.45,
+          "z": 0.02,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.12
+        },
+        "state": "picked",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 34,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 26.4,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 260,
+        "path_length_mm": 619.74,
+        "min_clearance_mm": 26.7,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 35,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 27.2,
+    "phase": "execution",
+    "message": "Installed belt belt-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "belt-001",
+        "kind": "belt",
+        "pose": {
+          "x": 0.43,
+          "y": 0.45,
+          "z": 0.02,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.12
+        },
+        "state": "installed",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 36,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 28.0,
+    "phase": "verification",
+    "message": "Verified fixture contains belt",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ],
+          "belt": [
+            "belt-001"
+          ]
+        },
+        "belt_seated": true,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 37,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 28.8,
+    "phase": "perception",
+    "message": "Detected motor candidate motor-001",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "motor-001",
+        "kind": "motor",
+        "pose": {
+          "x": 0.510462617691705,
+          "y": 0.3593800828479047,
+          "z": 0.05,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.2
+        },
+        "confidence": 0.934,
+        "occlusion": 0.293,
+        "view_id": "view-005"
+      }
+    }
+  },
+  {
+    "sequence": 38,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 29.6,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for motor-001",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "motor-001",
+        "arm": "right_arm",
+        "pose": {
+          "x": 0.510462617691705,
+          "y": 0.3593800828479047,
+          "z": 0.14,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.2
+        },
+        "score": 0.904,
+        "clearance_mm": 18.0,
+        "reason": "side grasp avoiding shaft"
+      }
+    }
+  },
+  {
+    "sequence": 39,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 30.4,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.510462617691705,
+          "y": 0.3593800828479047,
+          "z": 0.14,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.2
+        },
+        "planning_time_ms": 157,
+        "path_length_mm": 375.09,
+        "min_clearance_mm": 30.37,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 40,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 31.2,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": -0.08,
+          "z": 0.18,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 178,
+        "path_length_mm": 425.21,
+        "min_clearance_mm": 29.62,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 41,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 32.0,
+    "phase": "bimanual_coordination",
+    "message": "left_arm stabilizes fixture while right_arm installs motor",
+    "status": "pass",
+    "details": {
+      "assist_arm": "left_arm",
+      "active_arm": "right_arm",
+      "part_kind": "motor"
+    }
+  },
+  {
+    "sequence": 42,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 32.8,
+    "phase": "execution",
+    "message": "right_arm picked motor-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "motor-001",
+        "kind": "motor",
+        "pose": {
+          "x": 0.51,
+          "y": 0.36,
+          "z": 0.05,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.2
+        },
+        "state": "picked",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 43,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 33.6,
+    "phase": "motion_planning",
+    "message": "Planned right_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "right_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 262,
+        "path_length_mm": 624.6,
+        "min_clearance_mm": 26.63,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 44,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 34.4,
+    "phase": "execution",
+    "message": "Installed motor motor-001",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "motor-001",
+        "kind": "motor",
+        "pose": {
+          "x": 0.51,
+          "y": 0.36,
+          "z": 0.05,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.2
+        },
+        "state": "installed",
+        "metadata": {}
+      }
+    }
+  },
+  {
+    "sequence": 45,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 35.2,
+    "phase": "verification",
+    "message": "Verified fixture contains motor",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ],
+          "belt": [
+            "belt-001"
+          ],
+          "motor": [
+            "motor-001"
+          ]
+        },
+        "belt_seated": true,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 46,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 36.0,
+    "phase": "perception",
+    "message": "Detected sensor candidate sensor-002",
+    "status": "pass",
+    "details": {
+      "detection": {
+        "part_id": "sensor-002",
+        "kind": "sensor",
+        "pose": {
+          "x": 0.5621508107542922,
+          "y": 0.54873765571799,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.08
+        },
+        "confidence": 0.826,
+        "occlusion": 0.356,
+        "view_id": "view-006"
+      }
+    }
+  },
+  {
+    "sequence": 47,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 36.8,
+    "phase": "grasp_planning",
+    "message": "Selected grasp for sensor-002",
+    "status": "pass",
+    "details": {
+      "grasp": {
+        "part_id": "sensor-002",
+        "arm": "left_arm",
+        "pose": {
+          "x": 0.5621508107542922,
+          "y": 0.54873765571799,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.08
+        },
+        "score": 0.826,
+        "clearance_mm": 22.0,
+        "reason": "top-side pinch grasp"
+      }
+    }
+  },
+  {
+    "sequence": 48,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 37.6,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.5621508107542922,
+          "y": 0.54873765571799,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.08
+        },
+        "planning_time_ms": 444,
+        "path_length_mm": 1057.58,
+        "min_clearance_mm": 20.14,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 49,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 38.4,
+    "phase": "execution",
+    "message": "left_arm picked sensor-002",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "sensor-002",
+        "kind": "sensor",
+        "pose": {
+          "x": 0.56,
+          "y": 0.55,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.08
+        },
+        "state": "picked",
+        "metadata": {
+          "part_number": "SENSOR-REV-C",
+          "expected_part_number": "SENSOR-REV-C"
+        }
+      }
+    }
+  },
+  {
+    "sequence": 50,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 39.2,
+    "phase": "motion_planning",
+    "message": "Planned left_arm move",
+    "status": "pass",
+    "details": {
+      "plan": {
+        "arm": "left_arm",
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.12,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "planning_time_ms": 329,
+        "path_length_mm": 785.57,
+        "min_clearance_mm": 24.22,
+        "status": "pass",
+        "note": "collision-free path"
+      }
+    }
+  },
+  {
+    "sequence": 51,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 40.0,
+    "phase": "execution",
+    "message": "Installed sensor sensor-002",
+    "status": "pass",
+    "details": {
+      "part": {
+        "id": "sensor-002",
+        "kind": "sensor",
+        "pose": {
+          "x": 0.56,
+          "y": 0.55,
+          "z": 0.03,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": -0.08
+        },
+        "state": "installed",
+        "metadata": {
+          "part_number": "SENSOR-REV-C",
+          "expected_part_number": "SENSOR-REV-C"
+        }
+      }
+    }
+  },
+  {
+    "sequence": 52,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 40.8,
+    "phase": "verification",
+    "message": "Verified fixture contains sensor",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ],
+          "belt": [
+            "belt-001"
+          ],
+          "motor": [
+            "motor-001"
+          ],
+          "sensor": [
+            "sensor-002"
+          ]
+        },
+        "belt_seated": true,
+        "clamp_closed": false,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 53,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 41.6,
+    "phase": "fixture",
+    "message": "Fixture clamp closed",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ],
+          "belt": [
+            "belt-001"
+          ],
+          "motor": [
+            "motor-001"
+          ],
+          "sensor": [
+            "sensor-002"
+          ]
+        },
+        "belt_seated": true,
+        "clamp_closed": true,
+        "functional_test_passed": false
+      }
+    }
+  },
+  {
+    "sequence": 54,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 42.4,
+    "phase": "verification",
+    "message": "Checked belt seating on both rollers",
+    "status": "pass",
+    "details": {
+      "belt_seated": true
+    }
+  },
+  {
+    "sequence": 55,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 43.2,
+    "phase": "functional_test",
+    "message": "Mini conveyor moved test puck through sensor window",
+    "status": "pass",
+    "details": {
+      "fixture": {
+        "id": "fixture-conveyor-a",
+        "pose": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "roll": 0.0,
+          "pitch": 0.0,
+          "yaw": 0.0
+        },
+        "installed": {
+          "base_plate": [
+            "base-001"
+          ],
+          "roller": [
+            "roller-001",
+            "roller-002"
+          ],
+          "belt": [
+            "belt-001"
+          ],
+          "motor": [
+            "motor-001"
+          ],
+          "sensor": [
+            "sensor-002"
+          ]
+        },
+        "belt_seated": true,
+        "clamp_closed": true,
+        "functional_test_passed": true
+      }
+    }
+  },
+  {
+    "sequence": 56,
+    "timestamp": "2026-06-23T20:35:58.663+00:00",
+    "sim_time_s": 44.0,
+    "phase": "job",
+    "message": "Assembly cycle completed",
+    "status": "pass",
+    "details": {
+      "cell": {
+        "job_id": "JOB-CONVEYOR-WRONG_PART",
+        "fixture": {
+          "id": "fixture-conveyor-a",
+          "pose": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0,
+            "yaw": 0.0
+          },
+          "installed": {
+            "base_plate": [
+              "base-001"
+            ],
+            "roller": [
+              "roller-001",
+              "roller-002"
+            ],
+            "belt": [
+              "belt-001"
+            ],
+            "motor": [
+              "motor-001"
+            ],
+            "sensor": [
+              "sensor-002"
+            ]
+          },
+          "belt_seated": true,
+          "clamp_closed": true,
+          "functional_test_passed": true
+        },
+        "parts": {
+          "base-001": {
+            "id": "base-001",
+            "kind": "base_plate",
+            "pose": {
+              "x": 0.18,
+              "y": 0.42,
+              "z": 0.03,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 0.04
+            },
+            "state": "installed",
+            "metadata": {}
+          },
+          "roller-001": {
+            "id": "roller-001",
+            "kind": "roller",
+            "pose": {
+              "x": 0.32,
+              "y": 0.37,
+              "z": 0.04,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 1.48
+            },
+            "state": "installed",
+            "metadata": {}
+          },
+          "roller-002": {
+            "id": "roller-002",
+            "kind": "roller",
+            "pose": {
+              "x": 0.28,
+              "y": 0.49,
+              "z": 0.04,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 1.61
+            },
+            "state": "installed",
+            "metadata": {}
+          },
+          "belt-001": {
+            "id": "belt-001",
+            "kind": "belt",
+            "pose": {
+              "x": 0.43,
+              "y": 0.45,
+              "z": 0.02,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 0.12
+            },
+            "state": "installed",
+            "metadata": {}
+          },
+          "motor-001": {
+            "id": "motor-001",
+            "kind": "motor",
+            "pose": {
+              "x": 0.51,
+              "y": 0.36,
+              "z": 0.05,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": -0.2
+            },
+            "state": "installed",
+            "metadata": {}
+          },
+          "sensor-001": {
+            "id": "sensor-001",
+            "kind": "sensor",
+            "pose": {
+              "x": 0.49,
+              "y": 0.53,
+              "z": 0.03,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 0.03
+            },
+            "state": "rejected",
+            "metadata": {
+              "part_number": "SENSOR-REV-B",
+              "expected_part_number": "SENSOR-REV-C"
+            }
+          },
+          "fastener-001": {
+            "id": "fastener-001",
+            "kind": "fastener",
+            "pose": {
+              "x": 0.6,
+              "y": 0.39,
+              "z": 0.01,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 0.0
+            },
+            "state": "loose",
+            "metadata": {}
+          },
+          "fastener-002": {
+            "id": "fastener-002",
+            "kind": "fastener",
+            "pose": {
+              "x": 0.62,
+              "y": 0.43,
+              "z": 0.01,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": 0.0
+            },
+            "state": "loose",
+            "metadata": {}
+          },
+          "sensor-002": {
+            "id": "sensor-002",
+            "kind": "sensor",
+            "pose": {
+              "x": 0.56,
+              "y": 0.55,
+              "z": 0.03,
+              "roll": 0.0,
+              "pitch": 0.0,
+              "yaw": -0.08
+            },
+            "state": "installed",
+            "metadata": {
+              "part_number": "SENSOR-REV-C",
+              "expected_part_number": "SENSOR-REV-C"
+            }
+          }
+        },
+        "active_failures": [],
+        "cycle_time_s": 39.0
+      }
+    }
+  }
+]

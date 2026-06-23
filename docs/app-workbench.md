@@ -19,10 +19,11 @@ server so the browser can load the vendored Three.js module.
   minimum clearance, and simulated elapsed time.
 - Scenario comparison table.
 - Direct links to the acceptance report, event log, metrics JSON, and LinkedIn post draft.
-- Recording mode that hides nonessential panels and enlarges the replay for screen capture.
+- Video Mode that hides nonessential panels and switches the replay into a capture-ready
+  cinematic surface.
 
 Each scenario dashboard also includes playback speed, jump-to-critical controls, event
-filters, live state chips, a copyable run summary, and its own recording mode. The
+filters, live state chips, a copyable run summary, and its own video view. The
 main replay is a Three.js/WebGL robotics viewport with floor grid, coordinate axes,
 camera frustum, trays, fixture, robot links, tool poses, planned paths, and installed
 parts rendered from the event log.

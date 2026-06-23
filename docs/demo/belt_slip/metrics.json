@@ -1,0 +1,15 @@
+{
+  "final_status": "PASS",
+  "event_count": 55,
+  "pass_events": 53,
+  "warn_events": 0,
+  "fail_events": 1,
+  "recovered_events": 1,
+  "active_vision_events": 0,
+  "bimanual_events": 4,
+  "motion_plan_count": 16,
+  "average_planning_time_ms": 234,
+  "minimum_clearance_mm": 21.2,
+  "cycle_time_s": 32.5,
+  "simulated_elapsed_s": 43.2
+}

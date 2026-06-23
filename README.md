@@ -3,6 +3,12 @@
 Vision-guided robotic assembly cell that builds, tests, and recovers a working mini
 conveyor module from loose parts.
 
+[Live demo](https://earosenfeld.github.io/dual-arm-microfactory/demo/) |
+[Demo recording guide](docs/linkedin-recording-guide.md) |
+[Architecture](docs/architecture.md)
+
+![Dual-arm microfactory cinematic replay](docs/assets/hero-demo.gif)
+
 The project is simulation-first by design: the first version proves the architecture,
 failure handling, and demo story before any hardware is purchased or wired. Real robot,
 camera, PLC, and force-control adapters will replace the simulation ports over time.
@@ -23,6 +29,20 @@ The target demo:
 6. Recovery logic corrects the failure or sends the part to reject.
 7. A final functional test runs the conveyor.
 8. The cell exports an acceptance report with a full event timeline.
+
+## What Experts Should Notice
+
+- The deterministic supervisor owns state transitions, retries, recovery, and final
+  acceptance.
+- Vision confidence drives active re-observe events instead of pretending perception is
+  always perfect.
+- Motion plans carry path length, planning time, and minimum clearance into the event
+  log.
+- Bimanual steps are represented explicitly: one arm stabilizes while the other installs.
+- The same event log produces the dashboard replay, acceptance report, metrics, and
+  cinematic video mode.
+- Learned subskills are planned as bounded local policies, not as the safety-critical
+  system owner.
 
 ## Current MVP
 
@@ -52,14 +72,34 @@ PYTHONPATH=src python3 -m microfactory demo
 ```
 
 The generated `index.html` is an interactive scenario workbench with embedded replay
-dashboards, comparison metrics, reports, and a recording mode. Serve it with a local
+dashboards, comparison metrics, reports, and a video mode. Serve it with a local
 HTTP server so the browser can load the vendored Three.js module.
+
+The public demo is deployed from `docs/demo` with GitHub Pages:
+
+```text
+https://earosenfeld.github.io/dual-arm-microfactory/demo/
+```
 
 Run tests:
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
+
+## Screenshots
+
+### Replay Workbench
+
+![Scenario workbench with embedded WebGL replay](docs/assets/workbench.png)
+
+### Cinematic Video Mode
+
+![Cinematic video mode with robotics chapter overlay](docs/assets/cinematic.png)
+
+### Engineering Dashboard
+
+![RViz-style robotics dashboard with event inspector](docs/assets/dashboard.png)
 
 ## Near-Term Roadmap
 
