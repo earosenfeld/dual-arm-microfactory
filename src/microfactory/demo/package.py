@@ -191,6 +191,12 @@ def render_index(runs: list[DemoRun]) -> str:
       --violet: #ad8cff;
       --orange: #ff9f1c;
       --steel: #cad3de;
+      --phase-vision: #38a3ff;
+      --phase-planning: #ff9f1c;
+      --phase-motion: #ad8cff;
+      --phase-fault: #ff5f7a;
+      --phase-recovery: #2ee6d6;
+      --phase-accept: #43e07f;
       --shadow: 0 18px 50px rgba(0,0,0,0.28);
     }}
     * {{ box-sizing: border-box; }}
@@ -288,6 +294,7 @@ def render_index(runs: list[DemoRun]) -> str:
       border-color: rgba(46,230,214,0.55);
       color: #ffffff;
       background: linear-gradient(180deg, #26333a, #172026);
+      box-shadow: inset 0 -2px 0 var(--cyan);
     }}
     .menu-item .icon {{ color: var(--cyan); width: 15px; height: 15px; }}
     .menu-item:nth-child(2) .icon {{ color: var(--orange); }}
@@ -306,12 +313,21 @@ def render_index(runs: list[DemoRun]) -> str:
       margin-bottom: 8px;
     }}
     .status-card {{
+      position: relative;
       min-height: 56px;
       padding: 10px 11px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: linear-gradient(180deg, #15191f, #101318);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+      overflow: hidden;
+    }}
+    .status-card::before {{
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--card-accent, var(--cyan));
     }}
     .status-label {{
       display: flex;
@@ -394,30 +410,53 @@ def render_index(runs: list[DemoRun]) -> str:
       background: linear-gradient(180deg, #203039, #162025);
     }}
     .scenario-button {{
+      position: relative;
       min-height: 86px;
       display: grid;
-      grid-template-columns: 28px minmax(0, 1fr);
+      grid-template-columns: 32px minmax(0, 1fr);
       gap: 8px;
       align-items: start;
       justify-content: stretch;
       text-align: left;
       padding: 10px;
+      overflow: hidden;
+    }}
+    .scenario-button::before {{
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--scenario-accent, var(--cyan));
+      opacity: 0.78;
+    }}
+    .scenario-button.active {{
+      border-color: var(--scenario-accent, var(--cyan));
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--scenario-accent, var(--cyan)) 20%, transparent), transparent 42%),
+        linear-gradient(180deg, #242a33, #171c23);
+      color: #fff;
     }}
     .scenario-icon {{
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       display: grid;
       place-items: center;
       border-radius: 7px;
-      background: rgba(46,230,214,0.10);
-      color: var(--cyan);
-      border: 1px solid rgba(46,230,214,0.30);
+      background: color-mix(in srgb, var(--scenario-accent, var(--cyan)) 12%, transparent);
+      color: var(--scenario-accent, var(--cyan));
+      border: 1px solid color-mix(in srgb, var(--scenario-accent, var(--cyan)) 34%, transparent);
     }}
     .scenario-icon .icon {{ width: 16px; height: 16px; }}
     .scenario-meta {{
       display: grid;
       gap: 5px;
       min-width: 0;
+    }}
+    .scenario-index {{
+      color: var(--scenario-accent, var(--cyan));
+      font-size: 10px;
+      font-weight: 950;
+      text-transform: uppercase;
     }}
     .scenario-name {{
       color: #fff;
@@ -472,6 +511,25 @@ def render_index(runs: list[DemoRun]) -> str:
       align-items: center;
       gap: 8px;
     }}
+    .mode-pill {{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 6px 10px;
+      border: 1px solid rgba(46,230,214,0.36);
+      border-radius: 8px;
+      background: rgba(46,230,214,0.08);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }}
+    .mode-pill.video {{
+      border-color: rgba(255,159,28,0.48);
+      background: rgba(255,159,28,0.10);
+      color: var(--orange);
+    }}
     .metric-grid {{
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -493,6 +551,11 @@ def render_index(runs: list[DemoRun]) -> str:
       width: 3px;
       background: var(--cyan);
     }}
+    .metric:nth-child(2)::before {{ background: var(--phase-recovery); }}
+    .metric:nth-child(3)::before {{ background: var(--phase-vision); }}
+    .metric:nth-child(4)::before {{ background: var(--phase-motion); }}
+    .metric:nth-child(5)::before {{ background: var(--phase-planning); }}
+    .metric:nth-child(6)::before {{ background: var(--yellow); }}
     .metric-label {{
       display: flex;
       align-items: center;
@@ -533,6 +596,17 @@ def render_index(runs: list[DemoRun]) -> str:
       justify-content: space-between;
       gap: 14px;
       margin-bottom: 10px;
+    }}
+    #recordingModeButton {{
+      border-color: rgba(255,159,28,0.42);
+      color: var(--orange);
+      background: rgba(255,159,28,0.09);
+      min-width: 120px;
+    }}
+    .recording-mode #recordingModeButton {{
+      color: #fff;
+      background: linear-gradient(180deg, #3a2a16, #21170f);
+      box-shadow: inset 0 -2px 0 var(--orange);
     }}
     .pass {{ color: var(--green); }}
     .link-grid {{
@@ -642,31 +716,31 @@ def render_index(runs: list[DemoRun]) -> str:
         </div>
       </div>
       <nav class="menu-strip" aria-label="Workbench toolbar">
-        <span class="menu-item active"><svg class="icon"><use href="#icon-cube"></use></svg>Replay</span>
-        <span class="menu-item"><svg class="icon"><use href="#icon-route"></use></svg>Scenarios</span>
-        <span class="menu-item"><svg class="icon"><use href="#icon-clipboard"></use></svg>Evidence</span>
+        <span class="menu-item active"><svg class="icon"><use href="#icon-cube"></use></svg>Theater</span>
+        <span class="menu-item"><svg class="icon"><use href="#icon-route"></use></svg>Scenario Rail</span>
+        <span class="menu-item"><svg class="icon"><use href="#icon-clipboard"></use></svg>Evidence Pack</span>
       </nav>
       <div class="repo-pill"><svg class="icon"><use href="#icon-check"></use></svg>{pass_count}/{len(manifest["scenarios"])} PASS</div>
     </header>
 
     <section class="overview" aria-label="Demo package overview">
-      <div class="status-card">
+      <div class="status-card" style="--card-accent: var(--phase-accept);">
         <div class="status-label"><svg class="icon"><use href="#icon-cube"></use></svg>Scenarios</div>
         <div class="status-value">{len(manifest["scenarios"])} replays</div>
       </div>
-      <div class="status-card">
+      <div class="status-card" style="--card-accent: var(--phase-recovery);">
         <div class="status-label"><svg class="icon"><use href="#icon-check"></use></svg>Recoveries</div>
         <div class="status-value">{total_recoveries}</div>
       </div>
-      <div class="status-card">
+      <div class="status-card" style="--card-accent: var(--phase-motion);">
         <div class="status-label"><svg class="icon"><use href="#icon-robot"></use></svg>Bimanual</div>
         <div class="status-value">{total_bimanual} assists</div>
       </div>
-      <div class="status-card">
+      <div class="status-card" style="--card-accent: var(--phase-planning);">
         <div class="status-label"><svg class="icon"><use href="#icon-route"></use></svg>Motion Plans</div>
         <div class="status-value">{total_motion_plans}</div>
       </div>
-      <div class="status-card">
+      <div class="status-card" style="--card-accent: var(--yellow);">
         <div class="status-label"><svg class="icon"><use href="#icon-target"></use></svg>Min Clearance</div>
         <div class="status-value">{minimum_clearance} mm</div>
       </div>
@@ -675,7 +749,7 @@ def render_index(runs: list[DemoRun]) -> str:
     <section class="workbench">
       <div class="panel">
         <div class="panel-header">
-          <div class="panel-title"><svg class="icon"><use href="#icon-route"></use></svg>Mission Replays</div>
+          <div class="panel-title"><svg class="icon"><use href="#icon-route"></use></svg>Replay Theater</div>
           <div class="frame-actions">
             <a class="tool-link" id="dashboardTopLink" href="{first["dashboard"]}"><svg class="icon"><use href="#icon-open"></use></svg>Open Dashboard</a>
           </div>
@@ -683,7 +757,10 @@ def render_index(runs: list[DemoRun]) -> str:
         <div class="scenario-bar" id="scenarioButtons"></div>
         <div class="frame-top">
           <div class="frame-kicker"><svg class="icon"><use href="#icon-cube"></use></svg><span id="frameTitle">{first["title"]}</span></div>
-          <div class="frame-kicker"><svg class="icon"><use href="#icon-gauge"></use></svg><span id="frameStatus">{first["metrics"]["final_status"]}</span></div>
+          <div class="frame-actions">
+            <div class="mode-pill" id="frameMode"><svg class="icon"><use href="#icon-eye"></use></svg>Inspect View</div>
+            <div class="frame-kicker"><svg class="icon"><use href="#icon-gauge"></use></svg><span id="frameStatus">{first["metrics"]["final_status"]}</span></div>
+          </div>
         </div>
         <iframe id="replayFrame" src="{first["dashboard"]}?embed=1" title="Scenario replay dashboard"></iframe>
       </div>
@@ -698,7 +775,7 @@ def render_index(runs: list[DemoRun]) -> str:
               <div class="eyebrow" id="scenarioName">{first["name"]}</div>
               <h2 id="scenarioTitle">{first["title"]}</h2>
             </div>
-            <button id="recordingModeButton"><svg class="icon"><use href="#icon-record"></use></svg>Recording</button>
+            <button id="recordingModeButton"><svg class="icon"><use href="#icon-record"></use></svg>Video Mode</button>
           </div>
           <p id="scenarioDescription">{first["description"]}</p>
           <div class="metric-grid" id="metricGrid"></div>
@@ -753,20 +830,44 @@ def render_index(runs: list[DemoRun]) -> str:
     const el = (id) => document.getElementById(id);
     const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#icon-${{name}}"></use></svg>`;
 
+    function scenarioAccent(scenario, index) {{
+      const title = scenario.title.toLowerCase();
+      if (scenario.metrics.recovered_events > 0 || title.includes("recovery")) return "var(--phase-recovery)";
+      if (title.includes("vision")) return "var(--phase-vision)";
+      if (title.includes("bimanual")) return "var(--phase-motion)";
+      if (title.includes("acceptance")) return "var(--phase-accept)";
+      if (index === manifest.scenarios.length - 1) return "var(--phase-accept)";
+      return "var(--phase-planning)";
+    }}
+
+    function scenarioIcon(scenario, index) {{
+      const title = scenario.title.toLowerCase();
+      if (scenario.metrics.recovered_events > 0 || title.includes("recovery")) return "target";
+      if (title.includes("vision")) return "camera";
+      if (title.includes("bimanual")) return "robot";
+      if (title.includes("acceptance") || index === manifest.scenarios.length - 1) return "check";
+      return "route";
+    }}
+
     function syncReplayMode() {{
       document.body.classList.toggle("recording-mode", recordingMode);
       el("replayFrame").src = `${{current.dashboard}}${{recordingMode ? "?cinematic=1" : "?embed=1"}}`;
       el("frameTitle").textContent = recordingMode ? `${{current.title}} / Cinematic` : current.title;
+      el("frameMode").classList.toggle("video", recordingMode);
+      el("frameMode").innerHTML = recordingMode
+        ? `${{icon("record")}}Video Mode`
+        : `${{icon("eye")}}Inspect View`;
       el("recordingModeButton").innerHTML = recordingMode
-        ? `${{icon("record")}}Exit Recording`
-        : `${{icon("record")}}Recording`;
+        ? `${{icon("record")}}Exit Video`
+        : `${{icon("record")}}Video Mode`;
     }}
 
     function renderScenarioButtons() {{
       el("scenarioButtons").innerHTML = manifest.scenarios.map((scenario, index) => `
-        <button class="scenario-button" data-scenario-index="${{index}}">
-          <span class="scenario-icon">${{icon(index === 0 ? "target" : index === 4 ? "check" : "route")}}</span>
+        <button class="scenario-button" data-scenario-index="${{index}}" style="--scenario-accent:${{scenarioAccent(scenario, index)}}">
+          <span class="scenario-icon">${{icon(scenarioIcon(scenario, index))}}</span>
           <span class="scenario-meta">
+            <span class="scenario-index">${{String(index + 1).padStart(2, "0")}} / replay</span>
             <span class="scenario-name">${{scenario.title}}</span>
             <span class="scenario-stats">
               <span>${{scenario.metrics.final_status}}</span>

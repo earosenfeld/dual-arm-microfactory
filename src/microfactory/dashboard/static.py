@@ -47,6 +47,13 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       --violet: #ad8cff;
       --orange: #ff9f1c;
       --steel: #cad3de;
+      --phase-setup: #cad3de;
+      --phase-vision: #38a3ff;
+      --phase-planning: #ff9f1c;
+      --phase-motion: #ad8cff;
+      --phase-fault: #ff5f7a;
+      --phase-recovery: #2ee6d6;
+      --phase-accept: #43e07f;
       --shadow: 0 18px 50px rgba(0,0,0,0.28);
     }
     * { box-sizing: border-box; }
@@ -158,6 +165,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       border-color: rgba(46,230,214,0.55);
       color: #ffffff;
       background: linear-gradient(180deg, #26333a, #172026);
+      box-shadow: inset 0 -2px 0 var(--cyan);
     }
     h2 {
       display: flex;
@@ -195,12 +203,21 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       margin-bottom: 8px;
     }
     .status-cell {
+      position: relative;
       min-height: 48px;
       padding: 10px 11px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: linear-gradient(180deg, #15191f, #101318);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+      overflow: hidden;
+    }
+    .status-cell::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--status-accent, var(--cyan));
     }
     .status-head {
       display: flex;
@@ -218,7 +235,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .status-head .icon {
       width: 14px;
       height: 14px;
-      color: var(--orange);
+      color: var(--status-accent, var(--orange));
     }
     .status-v {
       font-size: 14px;
@@ -769,35 +786,78 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       padding-right: 4px;
     }
     .event {
+      position: relative;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: linear-gradient(180deg, #20262e, #171c23);
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--event-accent, var(--orange)) 18%, transparent), transparent 32%),
+        linear-gradient(180deg, #20262e, #171c23);
       padding: 10px;
       cursor: pointer;
+      overflow: hidden;
     }
-    .event.active { border-color: var(--orange); background: #2b251b; }
+    .event::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--event-accent, var(--orange));
+      box-shadow: 0 0 16px color-mix(in srgb, var(--event-accent, var(--orange)) 60%, transparent);
+    }
+    .event:hover {
+      border-color: color-mix(in srgb, var(--event-accent, var(--orange)) 62%, var(--line));
+    }
+    .event.active {
+      border-color: var(--event-accent, var(--orange));
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--event-accent, var(--orange)) 28%, transparent), transparent 46%),
+        linear-gradient(180deg, #242a33, #181d24);
+    }
     .event-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 4px;
       color: var(--muted);
       font-size: 12px;
+    }
+    .event-seq {
+      min-width: 34px;
+      border: 1px solid color-mix(in srgb, var(--event-accent, var(--orange)) 44%, transparent);
+      border-radius: 6px;
+      background: color-mix(in srgb, var(--event-accent, var(--orange)) 12%, transparent);
+      color: #fff;
+      padding: 3px 6px;
+      text-align: center;
+      font-weight: 900;
+      font-size: 11px;
     }
     .event-phase {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       min-width: 0;
+      color: #eef3f8;
+      font-weight: 850;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .event-phase .icon {
       width: 14px;
       height: 14px;
-      color: var(--orange);
+      color: var(--event-accent, var(--orange));
     }
     .event-msg {
       font-size: 13px;
       line-height: 1.35;
+      color: #dce6f0;
+      padding-left: 42px;
+    }
+    .timeline-marker {
+      background: var(--marker-color, var(--blue));
+      box-shadow: 0 0 14px var(--marker-color, var(--blue));
     }
     .status-pass { color: var(--green); }
     .status-warn { color: var(--yellow); }
@@ -1289,23 +1349,23 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     </header>
 
     <section class="status-strip" aria-label="Run status">
-      <div class="status-cell">
+      <div class="status-cell" style="--status-accent: var(--phase-accept);">
         <div class="status-head"><svg class="icon"><use href="#icon-cube"></use></svg><div class="status-k">Scenario</div></div>
         <div class="status-v" id="scenarioName">conveyor recovery</div>
       </div>
-      <div class="status-cell">
+      <div class="status-cell" style="--status-accent: var(--phase-planning);">
         <div class="status-head"><svg class="icon"><use href="#icon-route"></use></svg><div class="status-k">Planner</div></div>
         <div class="status-v" id="plannerHealth">deterministic</div>
       </div>
-      <div class="status-cell">
+      <div class="status-cell" style="--status-accent: var(--yellow);">
         <div class="status-head"><svg class="icon"><use href="#icon-target"></use></svg><div class="status-k">Clearance</div></div>
         <div class="status-v" id="clearanceReadout">-- mm</div>
       </div>
-      <div class="status-cell">
+      <div class="status-cell" style="--status-accent: var(--phase-vision);">
         <div class="status-head"><svg class="icon"><use href="#icon-eye"></use></svg><div class="status-k">Vision Confidence</div></div>
         <div class="status-v" id="confidenceReadout">--</div>
       </div>
-      <div class="status-cell">
+      <div class="status-cell" style="--status-accent: var(--phase-motion);">
         <div class="status-head"><svg class="icon"><use href="#icon-robot"></use></svg><div class="status-k">Robot Mode</div></div>
         <div class="status-v" id="robotMode">ready</div>
       </div>
@@ -1432,7 +1492,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
             <option value="240">1.75x</option>
             <option value="120">3.5x</option>
           </select>
-          <button id="recordingModeBtn" class="command-btn"><svg class="icon"><use href="#icon-record"></use></svg>Recording</button>
+          <button id="recordingModeBtn" class="command-btn"><svg class="icon"><use href="#icon-record"></use></svg>Video View</button>
           <span id="stepLabel" class="muted">0 / 0</span>
         </div>
       </section>
@@ -2196,6 +2256,23 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       return "timeline";
     }
 
+    function phaseAccent(event) {
+      if (event.status === "fail") return "var(--phase-fault)";
+      if (event.status === "recovered" || event.phase === "recovery") return "var(--phase-recovery)";
+      if (event.phase.includes("vision") || event.phase === "perception") return "var(--phase-vision)";
+      if (event.phase.includes("planning")) return "var(--phase-planning)";
+      if (event.phase === "bimanual_coordination" || event.phase === "execution") return "var(--phase-motion)";
+      if (event.phase === "functional_test" || event.phase === "verification") return "var(--phase-accept)";
+      return "var(--phase-setup)";
+    }
+
+    function phaseLabel(phase) {
+      return phase
+        .split("_")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+    }
+
     function isCritical(event) {
       return event.status !== "pass" || criticalPhases.has(event.phase);
     }
@@ -2424,7 +2501,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         if (!isCritical(event)) return "";
         const left = (i / max) * 100;
         const cls = event.status === "fail" ? "timeline-marker fail" : "timeline-marker";
-        return `<span class="${cls}" style="left:${left}%"></span>`;
+        return `<span class="${cls}" style="left:${left}%; --marker-color:${phaseAccent(event)}"></span>`;
       }).join("");
       const cursor = `<span class="timeline-cursor" style="left:${(index / max) * 100}%"></span>`;
       el("timelineMini").innerHTML = markers + cursor;
@@ -2555,9 +2632,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     function renderEvents() {
       const rows = filteredEvents();
       el("eventList").innerHTML = rows.map(([event, i]) => `
-        <div class="event" data-event-index="${i}">
+        <div class="event" data-event-index="${i}" style="--event-accent:${phaseAccent(event)}">
           <div class="event-top">
-            <span class="event-phase">${svgIcon(phaseIcon(event.phase, event.status))}#${event.sequence} ${event.phase}</span>
+            <span class="event-seq">#${event.sequence}</span>
+            <span class="event-phase">${svgIcon(phaseIcon(event.phase, event.status))}${phaseLabel(event.phase)}</span>
             <span class="${statusClass(event.status)}">${event.status}</span>
           </div>
           <div class="event-msg">${event.message}</div>
@@ -2639,9 +2717,9 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     el("recordingModeBtn").addEventListener("click", () => {
       document.body.classList.toggle("recording-mode");
       if (document.body.classList.contains("recording-mode")) {
-        setButtonContent("recordingModeBtn", "record", "Exit Recording");
+        setButtonContent("recordingModeBtn", "record", "Exit Video");
       } else {
-        setButtonContent("recordingModeBtn", "record", "Recording");
+        setButtonContent("recordingModeBtn", "record", "Video View");
       }
       requestAnimationFrame(resizeRenderer);
     });
