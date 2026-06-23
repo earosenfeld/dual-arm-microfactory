@@ -899,6 +899,239 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       height: 720px;
       min-height: 720px;
     }
+    .cinematic-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 9;
+      pointer-events: none;
+    }
+    .cinematic-mode main {
+      width: 100vw;
+      padding: 0;
+    }
+    .cinematic-mode header,
+    .cinematic-mode .details,
+    .cinematic-mode .status-strip,
+    .cinematic-mode .statusbar,
+    .cinematic-mode .left-panel,
+    .cinematic-mode .right-panel,
+    .cinematic-mode .controls,
+    .cinematic-mode .viewport-toolbar,
+    .cinematic-mode .viewport-badge,
+    .cinematic-mode .viewport-readout,
+    .cinematic-mode .view-cube,
+    .cinematic-mode .legend,
+    .cinematic-mode .hud {
+      display: none;
+    }
+    .cinematic-mode .sim-shell {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .cinematic-mode .viewport-panel {
+      min-height: 100vh;
+      border: 0;
+      border-radius: 0;
+    }
+    .cinematic-mode #robotViewport {
+      height: 100vh;
+      min-height: 100vh;
+      cursor: none;
+    }
+    .cinematic-mode .camera-inset {
+      left: 24px;
+      bottom: 132px;
+      width: 280px;
+    }
+    .cinematic-mode .cinematic-overlay {
+      display: block;
+    }
+    .cinematic-titlebar,
+    .cinematic-card,
+    .cinematic-rail {
+      position: absolute;
+      border: 1px solid rgba(121,147,170,0.34);
+      border-radius: 8px;
+      background: rgba(9,12,16,0.91);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.34);
+    }
+    .cinematic-titlebar {
+      top: 22px;
+      left: 22px;
+      right: 22px;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 13px 16px;
+    }
+    .cinematic-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .cinematic-brand .brand-mark {
+      width: 40px;
+      height: 40px;
+    }
+    .cinematic-kicker {
+      color: var(--cyan);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+    .cinematic-heading {
+      color: #fff;
+      font-size: 30px;
+      font-weight: 950;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+    .cinematic-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 112px;
+      justify-content: center;
+      border: 1px solid rgba(67,224,127,0.48);
+      border-radius: 8px;
+      background: rgba(67,224,127,0.08);
+      color: var(--green);
+      padding: 10px 12px;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+    .cinematic-card {
+      right: 24px;
+      bottom: 132px;
+      width: min(430px, calc(100vw - 48px));
+      padding: 16px;
+      border-left: 4px solid var(--orange);
+    }
+    .cinematic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--orange);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+    .cinematic-card h2 {
+      font-size: 38px;
+      line-height: 1.02;
+      margin: 0 0 10px;
+      display: block;
+    }
+    .cinematic-card p {
+      color: #dbe4ee;
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.42;
+    }
+    .cinematic-rail {
+      left: 24px;
+      right: 24px;
+      bottom: 22px;
+      min-height: 82px;
+      display: grid;
+      grid-template-columns: minmax(180px, 240px) 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+    }
+    .cinematic-time {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .cinematic-time strong {
+      display: block;
+      color: #fff;
+      font-size: 24px;
+      margin-top: 3px;
+    }
+    .cinematic-chapters {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .chapter-pill {
+      position: relative;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr);
+      align-items: center;
+      gap: 7px;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.035);
+      padding: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      overflow: hidden;
+    }
+    .chapter-pill::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: transparent;
+    }
+    .chapter-pill .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .chapter-pill.active {
+      border-color: var(--orange);
+      background: rgba(255,159,28,0.12);
+      color: #fff;
+    }
+    .chapter-pill.active::after {
+      background: linear-gradient(90deg, var(--orange), #fff2b0);
+    }
+    .chapter-pill.done {
+      border-color: rgba(46,230,214,0.36);
+      color: var(--cyan);
+    }
+    .chapter-pill.done::after {
+      background: var(--cyan);
+    }
+    @media (max-width: 900px) {
+      .cinematic-mode .camera-inset { display: none; }
+      .cinematic-titlebar {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+      }
+      .cinematic-heading { font-size: 22px; }
+      .cinematic-card h2 { font-size: 28px; }
+      .cinematic-card p { font-size: 15px; }
+      .cinematic-card {
+        left: 12px;
+        right: 12px;
+        bottom: 118px;
+        width: auto;
+      }
+      .cinematic-rail {
+        left: 12px;
+        right: 12px;
+        grid-template-columns: 1fr;
+      }
+      .cinematic-chapters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
     @media (max-width: 1280px) {
       .sim-shell { grid-template-columns: 1fr; }
       .left-panel { order: 2; }
@@ -1144,6 +1377,30 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
             <div class="camera-feed"></div>
             <div class="camera-foot"><span id="visionMode">waiting for detection</span><strong id="visionConfidence">--</strong></div>
           </div>
+          <div class="cinematic-overlay" aria-hidden="true">
+            <div class="cinematic-titlebar">
+              <div class="cinematic-brand">
+                <div class="brand-mark"><svg class="icon"><use href="#icon-logo"></use></svg></div>
+                <div>
+                  <div class="cinematic-kicker">Autonomous Recovery Demo</div>
+                  <div class="cinematic-heading">Dual-Arm Microfactory Replay</div>
+                </div>
+              </div>
+              <div class="cinematic-status"><svg class="icon"><use href="#icon-check"></use></svg><span id="cinematicStatus">RUN</span></div>
+            </div>
+            <div class="cinematic-card">
+              <div class="cinematic-badge" id="cinematicBadge"><svg class="icon"><use href="#icon-cube"></use></svg>Opening</div>
+              <h2 id="cinematicTitle">Starting autonomous assembly</h2>
+              <p id="cinematicBody">The cell begins from loose parts and builds a conveyor module with perception, planning, bimanual coordination, recovery, and final acceptance.</p>
+            </div>
+            <div class="cinematic-rail">
+              <div class="cinematic-time">
+                Replay Time
+                <strong id="cinematicTime">0.0s</strong>
+              </div>
+              <div class="cinematic-chapters" id="cinematicChapters"></div>
+            </div>
+          </div>
           <div class="hud">
             <div class="hud-chip">
               <div class="hud-label">Sim Time</div>
@@ -1247,13 +1504,18 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     const payload = __PAYLOAD__;
     const events = payload.events;
     const viewport = document.getElementById("robotViewport");
-    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+    const query = new URLSearchParams(window.location.search);
+    const cinematicEnabled = query.get("cinematic") === "1";
+    if (query.get("embed") === "1" || cinematicEnabled) {
       document.body.classList.add("embed-mode");
+    }
+    if (cinematicEnabled) {
+      document.body.classList.add("cinematic-mode");
     }
     let index = 0;
     let playing = false;
     let timer = null;
-    let playbackMs = 420;
+    let playbackMs = cinematicEnabled ? 620 : 420;
     let eventFilter = "all";
     let showGhosts = true;
     const displayState = {
@@ -1265,14 +1527,18 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     };
     let tween = null;
     let cameraTarget = new THREE.Vector3(0, 0.18, 0.35);
-    let orbit = { yaw: -0.78, pitch: 0.58, radius: 6.2 };
+    let orbit = cinematicEnabled
+      ? { yaw: -0.68, pitch: 0.52, radius: 6.45 }
+      : { yaw: -0.78, pitch: 0.58, radius: 6.2 };
     let dragging = false;
     let lastPointer = { x: 0, y: 0 };
+    let cinematicAutoStarted = false;
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
     const svgIcon = (name) => `<svg class="icon" aria-hidden="true"><use href="#icon-${name}"></use></svg>`;
     const criticalPhases = new Set(["active_vision", "bimanual_coordination", "functional_test"]);
+    const cinematicChapters = buildCinematicChapters();
     const colors = {
       blue: 0x62b6ff,
       left: 0x62b6ff,
@@ -1866,6 +2132,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         applySceneState(lerpState(tween.from, tween.to, t));
         if (t >= 1) tween = null;
       }
+      if (cinematicEnabled && !dragging) {
+        orbit.yaw -= 0.00018;
+        updateOrbitCamera();
+      }
       renderer.render(scene, camera);
       requestAnimationFrame(renderLoop);
     }
@@ -1885,6 +2155,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
       renderTopStatus(current, target);
       renderEventInspector(current, target);
       renderTimelineMini();
+      updateCinematicOverlay(current);
       if (Math.abs(index - oldIndex) === 1) {
         animateTo(from, target);
       } else {
@@ -2176,6 +2447,111 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         .replaceAll("'", "&#039;");
     }
 
+    function firstEventIndex(predicate, fallback = 0) {
+      const found = events.findIndex(predicate);
+      return found >= 0 ? found : fallback;
+    }
+
+    function buildCinematicChapters() {
+      const failIndex = firstEventIndex((event) => event.status === "fail", Math.floor(events.length * 0.62));
+      const recoveryIndex = firstEventIndex((event) => event.status === "recovered" || event.phase === "recovery", failIndex + 1);
+      const bimanualIndex = firstEventIndex((event) => event.phase === "bimanual_coordination", Math.floor(events.length * 0.38));
+      const functionalIndex = firstEventIndex((event) => event.phase === "functional_test" && event.status === "pass", events.length - 1);
+      const chapters = [
+        {
+          index: 0,
+          label: "Setup",
+          badge: "Autonomous start",
+          icon: "cube",
+          title: "From loose parts to accepted assembly",
+          body: "The supervisor owns the sequence while perception, planning, and robot execution produce a replayable evidence trail.",
+        },
+        {
+          index: firstEventIndex((event) => event.phase === "perception", 1),
+          label: "Perceive",
+          badge: "RGB-D perception",
+          icon: "camera",
+          title: "Vision estimates part pose",
+          body: "The cell detects parts, tracks pose confidence, and records the evidence needed to explain every downstream motion.",
+        },
+        {
+          index: firstEventIndex((event) => event.phase === "motion_planning", 2),
+          label: "Plan",
+          badge: "Collision-aware motion",
+          icon: "route",
+          title: "Planner clears the workcell",
+          body: "Each move includes path length, planning time, and minimum clearance instead of hiding behind a black-box animation.",
+        },
+        {
+          index: bimanualIndex,
+          label: "Coordinate",
+          badge: "Bimanual assist",
+          icon: "robot",
+          title: "Two arms stabilize the assembly",
+          body: "One arm supports or stabilizes while the other installs the part, matching the real constraints of physical automation.",
+        },
+        {
+          index: failIndex,
+          label: "Fault",
+          badge: "Fault detected",
+          icon: "target",
+          title: "The happy path breaks",
+          body: "A failure is injected and surfaced in the replay, turning the demo into a recovery story instead of a simple pick-and-place.",
+        },
+        {
+          index: recoveryIndex,
+          label: "Recover",
+          badge: "Supervisor recovery",
+          icon: "reset",
+          title: "Recovery is explicit and auditable",
+          body: "The deterministic supervisor backs out, retries the physical step, and records the successful recovery transition.",
+        },
+        {
+          index: functionalIndex,
+          label: "Accept",
+          badge: "Functional acceptance",
+          icon: "check",
+          title: "Final test closes the loop",
+          body: "The conveyor is functionally tested and the run exports metrics, event JSON, and an acceptance report.",
+        },
+      ];
+      return chapters
+        .filter((chapter, position, all) => all.findIndex((other) => other.index === chapter.index && other.label === chapter.label) === position)
+        .sort((a, b) => a.index - b.index);
+    }
+
+    function renderCinematicChapters() {
+      el("cinematicChapters").innerHTML = cinematicChapters.map((chapter) => `
+        <div class="chapter-pill" data-cinematic-index="${chapter.index}">
+          ${svgIcon(chapter.icon)}
+          <div>${safeHtml(chapter.label)}</div>
+        </div>
+      `).join("");
+    }
+
+    function currentCinematicChapter() {
+      let active = cinematicChapters[0];
+      for (const chapter of cinematicChapters) {
+        if (chapter.index <= index) active = chapter;
+      }
+      return active;
+    }
+
+    function updateCinematicOverlay(event) {
+      if (!cinematicEnabled) return;
+      const chapter = currentCinematicChapter();
+      el("cinematicBadge").innerHTML = `${svgIcon(chapter.icon)}${safeHtml(chapter.badge)}`;
+      setText("cinematicTitle", chapter.title);
+      setText("cinematicBody", chapter.body);
+      setText("cinematicTime", `${event.sim_time_s.toFixed(1)}s`);
+      setText("cinematicStatus", event.status === "fail" ? "FAULT" : event.status === "recovered" ? "RECOVERED" : payload.metrics.final_status);
+      document.querySelectorAll(".chapter-pill").forEach((node) => {
+        const chapterIndex = Number(node.dataset.cinematicIndex);
+        node.classList.toggle("active", chapterIndex === chapter.index);
+        node.classList.toggle("done", chapterIndex < chapter.index);
+      });
+    }
+
     function renderEvents() {
       const rows = filteredEvents();
       el("eventList").innerHTML = rows.map(([event, i]) => `
@@ -2307,12 +2683,23 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
     window.addEventListener("resize", resizeRenderer);
 
+    if (cinematicEnabled) {
+      el("speedSelect").value = String(playbackMs);
+    }
     renderMetrics();
     renderEvents();
+    renderCinematicChapters();
     syncDisplayButtons();
     resizeRenderer();
     setView("iso");
     renderAt(0);
+    if (cinematicEnabled) {
+      window.setTimeout(() => {
+        if (cinematicAutoStarted || playing) return;
+        cinematicAutoStarted = true;
+        play();
+      }, 650);
+    }
     requestAnimationFrame(renderLoop);
   </script>
 </body>

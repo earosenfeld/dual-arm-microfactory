@@ -22,6 +22,7 @@ class DemoPackageTests(unittest.TestCase):
             self.assertIn("Scenario Workbench", index)
             self.assertIn("recordingModeButton", index)
             self.assertIn("?embed=1", index)
+            self.assertIn("?cinematic=1", index)
             for scenario in DEMO_SCENARIOS:
                 dashboard = output_dir / scenario / "dashboard.html"
                 self.assertTrue(dashboard.exists())
@@ -43,6 +44,9 @@ class DemoPackageTests(unittest.TestCase):
                 self.assertIn("nextCriticalBtn", dashboard_html)
                 self.assertIn("filterBar", dashboard_html)
                 self.assertIn("copySummaryBtn", dashboard_html)
+                self.assertIn("cinematic-mode", dashboard_html)
+                self.assertIn("cinematic-overlay", dashboard_html)
+                self.assertIn("cinematicChapters", dashboard_html)
                 self.assertTrue(
                     (
                         output_dir

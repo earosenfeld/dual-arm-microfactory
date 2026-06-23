@@ -748,9 +748,19 @@ def render_index(runs: list[DemoRun]) -> str:
   <script>
     const manifest = {serialized};
     let current = manifest.scenarios[0];
+    let recordingMode = false;
 
     const el = (id) => document.getElementById(id);
     const icon = (name) => `<svg class="icon" aria-hidden="true"><use href="#icon-${{name}}"></use></svg>`;
+
+    function syncReplayMode() {{
+      document.body.classList.toggle("recording-mode", recordingMode);
+      el("replayFrame").src = `${{current.dashboard}}${{recordingMode ? "?cinematic=1" : "?embed=1"}}`;
+      el("frameTitle").textContent = recordingMode ? `${{current.title}} / Cinematic` : current.title;
+      el("recordingModeButton").innerHTML = recordingMode
+        ? `${{icon("record")}}Exit Recording`
+        : `${{icon("record")}}Recording`;
+    }}
 
     function renderScenarioButtons() {{
       el("scenarioButtons").innerHTML = manifest.scenarios.map((scenario, index) => `
@@ -790,12 +800,10 @@ def render_index(runs: list[DemoRun]) -> str:
       el("scenarioName").textContent = current.name;
       el("scenarioTitle").textContent = current.title;
       el("scenarioDescription").textContent = current.description;
-      el("replayFrame").src = `${{current.dashboard}}?embed=1`;
       el("dashboardLink").href = current.dashboard;
       el("dashboardTopLink").href = current.dashboard;
       el("reportLink").href = current.acceptance_report;
       el("eventsLink").href = current.events;
-      el("frameTitle").textContent = current.title;
       el("frameStatus").textContent = current.metrics.final_status;
 
       const m = current.metrics;
@@ -813,13 +821,12 @@ def render_index(runs: list[DemoRun]) -> str:
       document.querySelectorAll("[data-scenario-index]").forEach((button) => {{
         button.classList.toggle("active", Number(button.dataset.scenarioIndex) === index);
       }});
+      syncReplayMode();
     }}
 
     el("recordingModeButton").addEventListener("click", () => {{
-      document.body.classList.toggle("recording-mode");
-      el("recordingModeButton").innerHTML = document.body.classList.contains("recording-mode")
-        ? `${{icon("record")}}Exit Recording`
-        : `${{icon("record")}}Recording`;
+      recordingMode = !recordingMode;
+      syncReplayMode();
     }});
 
     renderScenarioButtons();
