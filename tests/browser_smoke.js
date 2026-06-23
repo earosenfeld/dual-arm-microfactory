@@ -85,6 +85,7 @@ async function smokeWorkbench(browser) {
     throw new Error(`unexpected workbench state: ${JSON.stringify(result)}`);
   }
   if (errors.length > 0) throw new Error(`browser errors: ${errors.join(" | ")}`);
+  await page.close();
 }
 
 async function smokeCinematic(browser) {
@@ -119,6 +120,7 @@ async function smokeCinematic(browser) {
   }
   if (result.time === "0.0s") throw new Error("cinematic autoplay did not advance replay time");
   if (errors.length > 0) throw new Error(`browser errors: ${errors.join(" | ")}`);
+  await page.close();
 }
 
 async function smokePreview(browser) {
@@ -155,6 +157,7 @@ async function smokePreview(browser) {
   }
   if (result.time === "0.0s") throw new Error("preview autoplay did not advance replay time");
   if (errors.length > 0) throw new Error(`browser errors: ${errors.join(" | ")}`);
+  await page.close();
 }
 
 (async () => {
