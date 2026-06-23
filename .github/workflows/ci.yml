@@ -26,6 +26,11 @@ jobs:
       - name: Verify committed public demo
         run: PYTHONPATH=src python scripts/verify_public_demo.py
 
+      - name: JavaScript syntax check
+        run: |
+          node --check tests/browser_smoke.js
+          node --check scripts/capture_readme_media.js
+
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.61.0

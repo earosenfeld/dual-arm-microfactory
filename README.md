@@ -7,7 +7,7 @@ conveyor module from loose parts.
 [Demo recording guide](docs/linkedin-recording-guide.md) |
 [Architecture](docs/architecture.md)
 
-![Dual-arm microfactory cinematic replay](docs/assets/hero-demo.gif)
+![Dual-arm microfactory robot viewport replay](docs/assets/hero-demo.gif)
 
 The project is simulation-first by design: the first version proves the architecture,
 failure handling, and demo story before any hardware is purchased or wired. Real robot,

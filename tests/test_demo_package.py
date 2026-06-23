@@ -47,6 +47,7 @@ class DemoPackageTests(unittest.TestCase):
                 self.assertIn("cinematic-mode", dashboard_html)
                 self.assertIn("cinematic-overlay", dashboard_html)
                 self.assertIn("cinematicChapters", dashboard_html)
+                self.assertIn("preview-mode", dashboard_html)
                 self.assertTrue(
                     (
                         output_dir

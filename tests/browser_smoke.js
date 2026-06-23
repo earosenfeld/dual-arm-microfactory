@@ -121,10 +121,47 @@ async function smokeCinematic(browser) {
   if (errors.length > 0) throw new Error(`browser errors: ${errors.join(" | ")}`);
 }
 
+async function smokePreview(browser) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+
+  await page.goto(new URL("belt_slip/dashboard.html?preview=1", baseUrl).toString(), {
+    waitUntil: "networkidle",
+  });
+  await page.waitForSelector("#robotViewport canvas", { timeout: 12000 });
+  await page.waitForFunction(() => document.body.classList.contains("preview-mode"), null, {
+    timeout: 12000,
+  });
+  await page.waitForTimeout(1900);
+
+  const result = await page.evaluate(() => ({
+    time: document.querySelector("#currentTime")?.textContent,
+    hiddenHud: getComputedStyle(document.querySelector(".hud")).display,
+    hiddenControls: getComputedStyle(document.querySelector(".controls")).display,
+    hiddenToolbar: getComputedStyle(document.querySelector(".viewport-toolbar")).display,
+  }));
+  const stats = await canvasStats(page);
+  if (!stats.ok) throw new Error(`preview canvas appears blank: ${JSON.stringify(stats)}`);
+  if (
+    result.hiddenHud !== "none"
+    || result.hiddenControls !== "none"
+    || result.hiddenToolbar !== "none"
+  ) {
+    throw new Error(`unexpected preview chrome state: ${JSON.stringify(result)}`);
+  }
+  if (result.time === "0.0s") throw new Error("preview autoplay did not advance replay time");
+  if (errors.length > 0) throw new Error(`browser errors: ${errors.join(" | ")}`);
+}
+
 (async () => {
   await withBrowser(async (browser) => {
     await smokeWorkbench(browser);
     await smokeCinematic(browser);
+    await smokePreview(browser);
   });
   console.log("browser smoke checks passed");
 })().catch((error) => {

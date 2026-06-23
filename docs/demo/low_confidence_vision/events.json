@@ -1,7 +1,7 @@
 [
   {
     "sequence": 1,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 0.0,
     "phase": "job",
     "message": "Started autonomous assembly for JOB-CONVEYOR-LOW_CONFIDENCE_VISION",
@@ -10,7 +10,7 @@
   },
   {
     "sequence": 2,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 0.8,
     "phase": "perception",
     "message": "Detected base_plate candidate base-001",
@@ -35,7 +35,7 @@
   },
   {
     "sequence": 3,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 1.6,
     "phase": "active_vision",
     "message": "Pose confidence below threshold; planning next-best-view capture",
@@ -57,7 +57,7 @@
   },
   {
     "sequence": 4,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 2.4,
     "phase": "active_vision",
     "message": "Updated pose estimate for base-001 after active view",
@@ -82,7 +82,7 @@
   },
   {
     "sequence": 5,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 3.2,
     "phase": "grasp_planning",
     "message": "Selected grasp for base-001",
@@ -107,7 +107,7 @@
   },
   {
     "sequence": 6,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 4.0,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -133,7 +133,7 @@
   },
   {
     "sequence": 7,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 4.8,
     "phase": "execution",
     "message": "left_arm picked base-001",
@@ -157,7 +157,7 @@
   },
   {
     "sequence": 8,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 5.6,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -183,7 +183,7 @@
   },
   {
     "sequence": 9,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 6.4,
     "phase": "execution",
     "message": "Installed base_plate base-001",
@@ -207,7 +207,7 @@
   },
   {
     "sequence": 10,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 7.2,
     "phase": "verification",
     "message": "Verified fixture contains base_plate",
@@ -236,7 +236,7 @@
   },
   {
     "sequence": 11,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 8.0,
     "phase": "perception",
     "message": "Detected roller candidate roller-001",
@@ -261,7 +261,7 @@
   },
   {
     "sequence": 12,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 8.8,
     "phase": "grasp_planning",
     "message": "Selected grasp for roller-001",
@@ -286,7 +286,7 @@
   },
   {
     "sequence": 13,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 9.6,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -312,7 +312,7 @@
   },
   {
     "sequence": 14,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 10.4,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -338,7 +338,7 @@
   },
   {
     "sequence": 15,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 11.2,
     "phase": "bimanual_coordination",
     "message": "left_arm stabilizes fixture while right_arm installs roller",
@@ -351,7 +351,7 @@
   },
   {
     "sequence": 16,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 12.0,
     "phase": "execution",
     "message": "right_arm picked roller-001",
@@ -375,7 +375,7 @@
   },
   {
     "sequence": 17,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 12.8,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -401,7 +401,7 @@
   },
   {
     "sequence": 18,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 13.6,
     "phase": "execution",
     "message": "Installed roller roller-001",
@@ -425,7 +425,7 @@
   },
   {
     "sequence": 19,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 14.4,
     "phase": "verification",
     "message": "Verified fixture contains roller",
@@ -458,7 +458,7 @@
   },
   {
     "sequence": 20,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 15.2,
     "phase": "perception",
     "message": "Detected roller candidate roller-002",
@@ -483,7 +483,7 @@
   },
   {
     "sequence": 21,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 16.0,
     "phase": "grasp_planning",
     "message": "Selected grasp for roller-002",
@@ -508,7 +508,7 @@
   },
   {
     "sequence": 22,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 16.8,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -534,7 +534,7 @@
   },
   {
     "sequence": 23,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 17.6,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -560,7 +560,7 @@
   },
   {
     "sequence": 24,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 18.4,
     "phase": "bimanual_coordination",
     "message": "left_arm stabilizes fixture while right_arm installs roller",
@@ -573,7 +573,7 @@
   },
   {
     "sequence": 25,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 19.2,
     "phase": "execution",
     "message": "right_arm picked roller-002",
@@ -597,7 +597,7 @@
   },
   {
     "sequence": 26,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 20.0,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -623,7 +623,7 @@
   },
   {
     "sequence": 27,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 20.8,
     "phase": "execution",
     "message": "Installed roller roller-002",
@@ -647,7 +647,7 @@
   },
   {
     "sequence": 28,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 21.6,
     "phase": "verification",
     "message": "Verified fixture contains roller",
@@ -680,7 +680,7 @@
   },
   {
     "sequence": 29,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 22.4,
     "phase": "perception",
     "message": "Detected belt candidate belt-001",
@@ -705,7 +705,7 @@
   },
   {
     "sequence": 30,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 23.2,
     "phase": "grasp_planning",
     "message": "Selected grasp for belt-001",
@@ -730,7 +730,7 @@
   },
   {
     "sequence": 31,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 24.0,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -756,7 +756,7 @@
   },
   {
     "sequence": 32,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 24.8,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -782,7 +782,7 @@
   },
   {
     "sequence": 33,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 25.6,
     "phase": "bimanual_coordination",
     "message": "right_arm stabilizes fixture while left_arm installs belt",
@@ -795,7 +795,7 @@
   },
   {
     "sequence": 34,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.373+00:00",
     "sim_time_s": 26.4,
     "phase": "execution",
     "message": "left_arm picked belt-001",
@@ -819,7 +819,7 @@
   },
   {
     "sequence": 35,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 27.2,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -845,7 +845,7 @@
   },
   {
     "sequence": 36,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 28.0,
     "phase": "execution",
     "message": "Installed belt belt-001",
@@ -869,7 +869,7 @@
   },
   {
     "sequence": 37,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 28.8,
     "phase": "verification",
     "message": "Verified fixture contains belt",
@@ -905,7 +905,7 @@
   },
   {
     "sequence": 38,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 29.6,
     "phase": "perception",
     "message": "Detected motor candidate motor-001",
@@ -930,7 +930,7 @@
   },
   {
     "sequence": 39,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 30.4,
     "phase": "grasp_planning",
     "message": "Selected grasp for motor-001",
@@ -955,7 +955,7 @@
   },
   {
     "sequence": 40,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 31.2,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -981,7 +981,7 @@
   },
   {
     "sequence": 41,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 32.0,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -1007,7 +1007,7 @@
   },
   {
     "sequence": 42,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 32.8,
     "phase": "bimanual_coordination",
     "message": "left_arm stabilizes fixture while right_arm installs motor",
@@ -1020,7 +1020,7 @@
   },
   {
     "sequence": 43,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 33.6,
     "phase": "execution",
     "message": "right_arm picked motor-001",
@@ -1044,7 +1044,7 @@
   },
   {
     "sequence": 44,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 34.4,
     "phase": "motion_planning",
     "message": "Planned right_arm move",
@@ -1070,7 +1070,7 @@
   },
   {
     "sequence": 45,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 35.2,
     "phase": "execution",
     "message": "Installed motor motor-001",
@@ -1094,7 +1094,7 @@
   },
   {
     "sequence": 46,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 36.0,
     "phase": "verification",
     "message": "Verified fixture contains motor",
@@ -1133,7 +1133,7 @@
   },
   {
     "sequence": 47,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 36.8,
     "phase": "perception",
     "message": "Detected sensor candidate sensor-001",
@@ -1158,7 +1158,7 @@
   },
   {
     "sequence": 48,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 37.6,
     "phase": "grasp_planning",
     "message": "Selected grasp for sensor-001",
@@ -1183,7 +1183,7 @@
   },
   {
     "sequence": 49,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 38.4,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -1209,7 +1209,7 @@
   },
   {
     "sequence": 50,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 39.2,
     "phase": "execution",
     "message": "left_arm picked sensor-001",
@@ -1233,7 +1233,7 @@
   },
   {
     "sequence": 51,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 40.0,
     "phase": "motion_planning",
     "message": "Planned left_arm move",
@@ -1259,7 +1259,7 @@
   },
   {
     "sequence": 52,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 40.8,
     "phase": "execution",
     "message": "Installed sensor sensor-001",
@@ -1283,7 +1283,7 @@
   },
   {
     "sequence": 53,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 41.6,
     "phase": "verification",
     "message": "Verified fixture contains sensor",
@@ -1325,7 +1325,7 @@
   },
   {
     "sequence": 54,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 42.4,
     "phase": "fixture",
     "message": "Fixture clamp closed",
@@ -1367,7 +1367,7 @@
   },
   {
     "sequence": 55,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 43.2,
     "phase": "verification",
     "message": "Checked belt seating on both rollers",
@@ -1378,7 +1378,7 @@
   },
   {
     "sequence": 56,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 44.0,
     "phase": "functional_test",
     "message": "Mini conveyor moved test puck through sensor window",
@@ -1420,7 +1420,7 @@
   },
   {
     "sequence": 57,
-    "timestamp": "2026-06-23T20:35:58.509+00:00",
+    "timestamp": "2026-06-23T21:18:32.374+00:00",
     "sim_time_s": 44.8,
     "phase": "job",
     "message": "Assembly cycle completed",

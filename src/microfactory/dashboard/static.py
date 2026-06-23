@@ -1007,6 +1007,39 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     .cinematic-mode .cinematic-overlay {
       display: block;
     }
+    .preview-mode main {
+      width: 100vw;
+      padding: 0;
+    }
+    .preview-mode header,
+    .preview-mode .details,
+    .preview-mode .status-strip,
+    .preview-mode .statusbar,
+    .preview-mode .left-panel,
+    .preview-mode .right-panel,
+    .preview-mode .controls,
+    .preview-mode .viewport-toolbar,
+    .preview-mode .viewport-badge,
+    .preview-mode .viewport-readout,
+    .preview-mode .view-cube,
+    .preview-mode .legend,
+    .preview-mode .camera-inset,
+    .preview-mode .hud {
+      display: none;
+    }
+    .preview-mode .sim-shell {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .preview-mode .viewport-panel {
+      min-height: 100vh;
+      border: 0;
+      border-radius: 0;
+    }
+    .preview-mode #robotViewport {
+      height: 100vh;
+      min-height: 100vh;
+    }
     .cinematic-titlebar,
     .cinematic-card,
     .cinematic-rail {
@@ -1566,16 +1599,20 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     const viewport = document.getElementById("robotViewport");
     const query = new URLSearchParams(window.location.search);
     const cinematicEnabled = query.get("cinematic") === "1";
-    if (query.get("embed") === "1" || cinematicEnabled) {
+    const previewEnabled = query.get("preview") === "1";
+    if (query.get("embed") === "1" || cinematicEnabled || previewEnabled) {
       document.body.classList.add("embed-mode");
     }
     if (cinematicEnabled) {
       document.body.classList.add("cinematic-mode");
     }
+    if (previewEnabled) {
+      document.body.classList.add("preview-mode");
+    }
     let index = 0;
     let playing = false;
     let timer = null;
-    let playbackMs = cinematicEnabled ? 620 : 420;
+    let playbackMs = cinematicEnabled ? 620 : previewEnabled ? 520 : 420;
     let eventFilter = "all";
     let showGhosts = true;
     const displayState = {
@@ -1587,12 +1624,12 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     };
     let tween = null;
     let cameraTarget = new THREE.Vector3(0, 0.18, 0.35);
-    let orbit = cinematicEnabled
+    let orbit = cinematicEnabled || previewEnabled
       ? { yaw: -0.68, pitch: 0.52, radius: 6.45 }
       : { yaw: -0.78, pitch: 0.58, radius: 6.2 };
     let dragging = false;
     let lastPointer = { x: 0, y: 0 };
-    let cinematicAutoStarted = false;
+    let autoPlaybackStarted = false;
 
     const el = (id) => document.getElementById(id);
     const statusClass = (status) => `status-${status}`;
@@ -2192,8 +2229,8 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
         applySceneState(lerpState(tween.from, tween.to, t));
         if (t >= 1) tween = null;
       }
-      if (cinematicEnabled && !dragging) {
-        orbit.yaw -= 0.00018;
+      if ((cinematicEnabled || previewEnabled) && !dragging) {
+        orbit.yaw -= previewEnabled ? 0.00014 : 0.00018;
         updateOrbitCamera();
       }
       renderer.render(scene, camera);
@@ -2761,7 +2798,7 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     el("scrubber").addEventListener("input", (event) => renderAt(Number(event.target.value)));
     window.addEventListener("resize", resizeRenderer);
 
-    if (cinematicEnabled) {
+    if (cinematicEnabled || previewEnabled) {
       el("speedSelect").value = String(playbackMs);
     }
     renderMetrics();
@@ -2771,10 +2808,10 @@ def write_static_dashboard(result: AssemblyResult, output_path: Path) -> None:
     resizeRenderer();
     setView("iso");
     renderAt(0);
-    if (cinematicEnabled) {
+    if (cinematicEnabled || previewEnabled) {
       window.setTimeout(() => {
-        if (cinematicAutoStarted || playing) return;
-        cinematicAutoStarted = true;
+        if (autoPlaybackStarted || playing) return;
+        autoPlaybackStarted = true;
         play();
       }, 650);
     }
